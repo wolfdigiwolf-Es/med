@@ -54,7 +54,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({ isOpen, onClos
     e.preventDefault();
     if (!formData.nom || !formData.prenom) return;
 
-    const newPatient: Omit<Patient, 'id'> = {
+    const newPatient: Omit<Patient, 'id' | 'organizationId'> = {
       nom: formData.nom.toUpperCase(),
       prenom: formData.prenom.charAt(0).toUpperCase() + formData.prenom.slice(1),
       sexe: formData.sexe,

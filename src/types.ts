@@ -1,4 +1,5 @@
 export type NavigationTab =
+  | 'landing'
   | 'dashboard'
   | 'patients'
   | 'patient-detail'
@@ -12,7 +13,9 @@ export type NavigationTab =
   | 'finances'
   | 'statistics'
   | 'security-compliance'
-  | 'settings';
+  | 'settings'
+  | 'support'
+  | 'wolf-admin';
 
 export type OrganismeAssuranceMaroc =
   | 'AMO CNSS'
@@ -25,8 +28,82 @@ export type OrganismeAssuranceMaroc =
   | 'Mutuelle MGPAP'
   | 'Paiement Direct (Sans couverture)';
 
+export type SubscriptionStatus =
+  | 'active'
+  | 'trial'
+  | 'past_due'
+  | 'suspended'
+  | 'cancelled'
+  | 'expired';
+
+export type UserRoleType =
+  | 'DOCTOR_OWNER' // Full medical and admin access to their own cabinet
+  | 'SECRETARY' // Admin, appointments, waiting room, payments. NO sensitive diagnoses/private clinical notes
+  | 'WOLF_DIGITAL_SUPERADMIN'; // Technical oversight, subscriptions, ARR, metrics. ZERO access to clinical data
+
+export interface RolePermissions {
+  canViewMedicalRecords: boolean;
+  canEditMedicalRecords: boolean;
+  canViewSensitiveDiagnoses: boolean;
+  canViewPrivateDoctorNotes: boolean;
+  canPrescribe: boolean;
+  canGenerateCertificates: boolean;
+  canManageAppointments: boolean;
+  canManageWaitingRoom: boolean;
+  canManagePayments: boolean;
+  canViewFinancials: boolean;
+  canExportData: boolean;
+  canDeleteRecords: boolean;
+  canManageUsers: boolean;
+  canViewAuditLogs: boolean;
+  canAccessTechnicalAdmin: boolean;
+}
+
+export interface Organization {
+  id: string; // ex: 'org-elqyami'
+  name: string;
+  slug: string;
+  speciality: string;
+  city: string;
+  address: string;
+  phone: string;
+  email: string;
+  ice: string; // Identifiant Commun de l'Entreprise (15 chiffres)
+  inpe: string; // Identifiant National des Professionnels de Santé
+  cnom: string; // Conseil National de l'Ordre des Médecins
+  plan: 'MEDICAL_OS_STANDARD';
+  priceMadPerYear: number; // 3000 MAD
+  subscriptionStatus: SubscriptionStatus;
+  subscriptionStart: string;
+  subscriptionEnd: string;
+  isAutoRenew: boolean;
+  storageUsedMb: number;
+  storageMaxMb: number;
+  backupStatus: 'healthy' | 'syncing' | 'warning';
+  lastBackupDate: string;
+  cndpDeclaration: string;
+  isDemoTenant?: boolean;
+}
+
+export interface UserAccount {
+  id: string;
+  organizationId: string;
+  role: UserRoleType;
+  roleLabel: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatarUrl?: string;
+  status: 'active' | 'disabled' | 'pending_2fa';
+  mfaEnabled: boolean;
+  createdAt: string;
+  lastLogin: string;
+  permissions: RolePermissions;
+}
+
 export interface Patient {
   id: string;
+  organizationId: string; // Strict multi-tenant organization boundary
   nom: string;
   prenom: string;
   sexe: 'F' | 'M';
@@ -56,10 +133,19 @@ export interface Patient {
   ald: boolean; // Affection Longue Durée (ALD / ALC reconnue AMO)
   nomAld?: string;
   notesGenerales?: string;
+  notesConfidentiellesMedecin?: string; // Restricted: Hidden from secretary role
+  estDossierSensible?: boolean; // If true, requires DOCTOR_OWNER level
   poidsRef?: number;
   tailleRef?: number;
   taRef?: string;
+  contactUrgence?: {
+    nom: string;
+    lien: string;
+    telephone: string;
+  };
   consentementLoi0908?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Vitals {
@@ -76,7 +162,9 @@ export interface Vitals {
 
 export interface Consultation {
   id: string;
+  organizationId: string; // Multi-tenant isolation
   patientId: string;
+  doctorId: string;
   patientNomComplet: string;
   date: string;
   heure: string;
@@ -90,11 +178,14 @@ export interface Consultation {
   codeCim10?: string;
   traitement: string;
   notesMedicales: string;
+  notesPriveesMedecin?: string; // Non accessible à la secrétaire
   tarif: number; // En DH
   reglementStatut: 'Payé' | 'En attente' | 'Tiers-payant';
   modePaiement?: 'Espèces' | 'Carte Bancaire' | 'Chèque' | 'Tiers Payant AMO' | 'Tiers Payant Mutuelle';
   ordonnanceId?: string;
   certificatId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PrescriptionItem {
@@ -113,13 +204,16 @@ export interface PrescriptionItem {
 
 export interface Prescription {
   id: string;
+  organizationId: string;
   consultationId?: string;
   patientId: string;
+  doctorId: string;
   patientNomComplet: string;
   date: string;
   aldConcernee: boolean;
   medicaments: PrescriptionItem[];
   conseilsHygiene?: string;
+  createdAt?: string;
 }
 
 export type CertificateType =
@@ -131,9 +225,11 @@ export type CertificateType =
 
 export interface MedicalCertificate {
   id: string;
+  organizationId: string;
   type: CertificateType;
   titre: string;
   patientId: string;
+  doctorId: string;
   patientNomComplet: string;
   date: string;
   dureeArretJours?: number;
@@ -142,11 +238,14 @@ export interface MedicalCertificate {
   sortiesAutorisees?: 'Avec restriction' | 'Sans restriction' | 'Non autorisées';
   sportPratique?: string;
   texteContenu: string;
+  createdAt?: string;
 }
 
 export interface Appointment {
   id: string;
+  organizationId: string;
   patientId: string;
+  doctorId?: string;
   patientNomComplet: string;
   date: string; // YYYY-MM-DD
   heureDebut: string; // HH:mm
@@ -155,10 +254,12 @@ export interface Appointment {
   type: 'Consultation' | 'Contrôle' | 'Urgence' | 'Vaccination' | 'Téléconsultation';
   statut: 'Confirmé' | 'En attente' | 'En cours' | 'Terminé' | 'Annulé';
   notes?: string;
+  createdAt?: string;
 }
 
 export interface WaitingPatient {
   id: string;
+  organizationId: string;
   patientId: string;
   nomComplet: string;
   age: number;
@@ -172,6 +273,7 @@ export interface WaitingPatient {
 
 export interface MedicalDocument {
   id: string;
+  organizationId: string;
   patientId: string;
   patientNomComplet: string;
   nom: string;
@@ -179,8 +281,15 @@ export interface MedicalDocument {
   date: string;
   taille: string;
   auteur: string;
+  uploadedByUserId: string;
   typeMime: string;
   apercuContenu?: string;
+  // Private Cloud Storage Vault properties
+  isPrivateVault: boolean;
+  vaultStoragePath: string;
+  encryptionAlgorithm: 'AES-256-GCM';
+  checksumSha256: string;
+  signedUrlExpiresInMinutes?: number;
 }
 
 export interface Medication {
@@ -199,6 +308,7 @@ export interface Medication {
 
 export interface PaymentTransaction {
   id: string;
+  organizationId: string;
   date: string;
   patientId: string;
   patientNomComplet: string;
@@ -207,10 +317,12 @@ export interface PaymentTransaction {
   modePaiement: 'Espèces' | 'Carte Bancaire' | 'Chèque' | 'Tiers Payant AMO' | 'Tiers Payant Mutuelle';
   statut: 'Payé' | 'En attente' | 'Impayé';
   dateEcheance?: string;
+  enregistreParUserId?: string;
 }
 
 export interface ExpenseItem {
   id: string;
+  organizationId: string;
   date: string;
   fournisseur: string;
   description: string;
@@ -227,6 +339,7 @@ export type UserRole = 'Médecin Titulaire' | 'Médecin Remplaçant' | 'Secréta
 
 export interface AccessUser {
   id: string;
+  organizationId: string;
   nom: string;
   prenom: string;
   role: UserRole;
@@ -256,16 +369,20 @@ export type AuditActionType =
   | 'MODIFICATION_CONSENTEMENT'
   | 'CONNEXION_UTILISATEUR'
   | 'TENTATIVE_ACCES_NON_AUTORISE'
-  | 'PURGE_ARCHIVAGE';
+  | 'PURGE_ARCHIVAGE'
+  | 'TELECHARGEMENT_DOCUMENT_PRIVE'
+  | 'RENOUVELLEMENT_ABONNEMENT'
+  | 'CHANGEMENT_ORGANISATION';
 
 export interface AuditLogEntry {
   id: string;
-  timestamp: string; // ISO string ou format lisible YYYY-MM-DD HH:mm:ss
+  organizationId: string;
+  timestamp: string; // YYYY-MM-DD HH:mm:ss
   userId: string;
   userName: string;
   userRole: string;
   actionType: AuditActionType;
-  categorie: 'Dossier Patient' | 'Prescription' | 'Sécurité & Accès' | 'Export' | 'Consentement';
+  categorie: 'Dossier Patient' | 'Prescription' | 'Sécurité & Accès' | 'Export' | 'Consentement' | 'Stockage Privé';
   patientId?: string;
   patientName?: string;
   ipAddress: string;
@@ -282,6 +399,7 @@ export type ConsentType =
 
 export interface PatientConsent {
   id: string;
+  organizationId: string;
   patientId: string;
   patientNom: string;
   cin: string;
@@ -308,9 +426,10 @@ export interface RetentionPolicy {
 
 export interface DataExportJob {
   id: string;
+  organizationId: string;
   dateDemande: string;
   demandeur: string;
-  typeExport: 'Dossier patient individuel (Portabilité Art. 8)' | 'Registre des traitements CNDP' | 'Journal d\'audit certifié' | 'Sauvegarde chiffrée de la base';
+  typeExport: 'Dossier patient individuel (Portabilité Art. 8)' | 'Registre des traitements CNDP' | 'Journal d\'audit certifié' | 'Sauvegarde chiffrée de la base' | 'Export Intégral Cabinet (CSV & JSON)';
   format: 'PDF' | 'JSON' | 'ZIP' | 'CSV';
   statut: 'Généré' | 'En cours' | 'Téléchargé';
   taille: string;
@@ -375,3 +494,47 @@ export interface PracticeSettings {
   privacyPolicy: PrivacyPolicyConfig;
 }
 
+// -------------------------------------------------------------
+// SUPPORT TICKETS & WOLF DIGITAL TECHNICAL COCKPIT
+// -------------------------------------------------------------
+
+export interface SupportTicketMessage {
+  id: string;
+  senderName: string;
+  senderRole: string;
+  isWolfStaff: boolean;
+  timestamp: string;
+  message: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  organizationId: string;
+  organizationName: string;
+  userId: string;
+  userName: string;
+  category: 'Bug technique' | 'Compte & Accès' | 'Abonnement & Facturation' | 'Sauvegarde & Export' | 'Demande d\'évolution';
+  priority: 'Basse' | 'Normale' | 'Haute' | 'Critique';
+  subject: string;
+  message: string;
+  status: 'Ouvert' | 'En cours de traitement' | 'Résolu' | 'Fermé';
+  createdAt: string;
+  updatedAt: string;
+  messages: SupportTicketMessage[];
+}
+
+export interface WolfDigitalMetric {
+  totalTenants: number;
+  activePaidTenants: number;
+  trialTenants: number;
+  annualPricePerTenantMAD: number; // 3000 MAD
+  arrTotalMAD: number; // Total Annual Recurring Revenue
+  mrrEquivalentMAD: number;
+  uptimePercentage: number;
+  errorRatePercentage: number;
+  totalStorageUsedGb: number;
+  activeDatabaseConnections: number;
+  rlsPoliciesEnforced: number;
+  lastBackupSyncTime: string;
+  version: string;
+}

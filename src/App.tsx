@@ -9,6 +9,7 @@ import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewDocumentModal } from './components/NewDocumentModal';
 
 // Views
+import { LandingPageView } from './views/LandingPageView';
 import { DashboardView } from './views/DashboardView';
 import { PatientsView } from './views/PatientsView';
 import { PatientDetailView } from './views/PatientDetailView';
@@ -23,6 +24,8 @@ import { FinancesView } from './views/FinancesView';
 import { StatisticsView } from './views/StatisticsView';
 import { SettingsView } from './views/SettingsView';
 import { SecurityComplianceView } from './views/SecurityComplianceView';
+import { SupportView } from './views/SupportView';
+import { WolfAdminView } from './views/WolfAdminView';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -74,6 +77,10 @@ const AppContent: React.FC = () => {
         return <SecurityComplianceView />;
       case 'settings':
         return <SettingsView />;
+      case 'support':
+        return <SupportView />;
+      case 'wolf-admin':
+        return <WolfAdminView />;
       default:
         return (
           <DashboardView
@@ -83,6 +90,64 @@ const AppContent: React.FC = () => {
         );
     }
   };
+
+  if (currentTab === 'landing') {
+    return (
+      <div className="w-full min-h-screen bg-slate-900 text-slate-100 font-sans antialiased">
+        <LandingPageView />
+
+        {/* Global Modals */}
+        <CommandPalette />
+        <PrintModal />
+        <NewPatientModal isOpen={isNewPatientOpen} onClose={() => setIsNewPatientOpen(false)} />
+        <NewAppointmentModal
+          isOpen={isNewAppointmentOpen}
+          onClose={() => setIsNewAppointmentOpen(false)}
+        />
+        <NewDocumentModal isOpen={isNewDocumentOpen} onClose={() => setIsNewDocumentOpen(false)} />
+
+        {/* Toast Notification Alerts */}
+        {toasts && toasts.length > 0 && (
+          <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+            {toasts.map((toast) => (
+              <div
+                key={toast.id}
+                className={`flex items-start gap-3 p-3.5 rounded-xl shadow-xl border text-xs max-w-sm backdrop-blur-md pointer-events-auto animate-in slide-in-from-bottom-3 duration-200 ${
+                  toast.type === 'success'
+                    ? 'bg-slate-900/95 text-white border-slate-700'
+                    : toast.type === 'warning'
+                    ? 'bg-amber-900/95 text-white border-amber-700'
+                    : 'bg-slate-900/95 text-white border-slate-700'
+                }`}
+              >
+                {toast.type === 'success' ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                ) : toast.type === 'warning' ? (
+                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                ) : (
+                  <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                )}
+
+                <div className="flex-1 space-y-0.5">
+                  <p className="font-bold text-xs">{toast.title}</p>
+                  {toast.description && (
+                    <p className="text-[11px] text-slate-300 leading-relaxed">{toast.description}</p>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => dismissToast(toast.id)}
+                  className="text-slate-400 hover:text-white p-0.5 rounded transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-full bg-[#f8fafc] text-slate-900 overflow-hidden font-sans antialiased selection:bg-blue-600 selection:text-white">
