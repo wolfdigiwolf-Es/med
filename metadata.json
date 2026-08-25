@@ -1,0 +1,6 @@
+{
+  "name": "MédiCabinet Pro",
+  "description": "Logiciel de gestion de cabinet médical moderne et interactif pour médecin généraliste.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
