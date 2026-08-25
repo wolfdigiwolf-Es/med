@@ -4,6 +4,8 @@ import {
   Organization,
   UserAccount,
   RolePermissions,
+  DoctorRegistrationData,
+  SecretaryRegistrationData,
   Patient,
   Consultation,
   Prescription,
@@ -91,6 +93,13 @@ interface AppContextType {
   isLoggedIn: boolean;
   login: (email: string) => boolean;
   logout: () => void;
+  registerDoctorCabinet: (data: DoctorRegistrationData) => { orgId: string; userId: string };
+  registerSecretary: (data: SecretaryRegistrationData) => { userId: string };
+  isRegisterModalOpen: boolean;
+  setIsRegisterModalOpen: (open: boolean) => void;
+  registerModalTab: 'doctor' | 'secretary' | 'login';
+  setRegisterModalTab: (tab: 'doctor' | 'secretary' | 'login') => void;
+  openRegisterModal: (tab?: 'doctor' | 'secretary' | 'login') => void;
   switchOrganizationAndUser: (orgId: string, userId?: string) => void;
   sessionMinutesRemaining: number;
   extendSession: () => void;
@@ -196,8 +205,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('dashboard');
+  // Navigation - default to landing page as requested
+  const [currentTab, setCurrentTab] = useState<NavigationTab>('landing');
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>('pat-agadir-1');
 
   // Multi-Tenant SaaS State
@@ -208,6 +217,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUserId, setCurrentUserId] = useState<string>('usr-elqyami-owner');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
   const [sessionMinutesRemaining, setSessionMinutesRemaining] = useState<number>(30);
+
+  // Registration & Onboarding modal state
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState<boolean>(false);
+  const [registerModalTab, setRegisterModalTab] = useState<'doctor' | 'secretary' | 'login'>('doctor');
+
+  const openRegisterModal = (tab: 'doctor' | 'secretary' | 'login' = 'doctor') => {
+    setRegisterModalTab(tab);
+    setIsRegisterModalOpen(true);
+  };
 
   // Global Master Datasets (Containing all organizations with strict RLS partition)
   const [allPatients, setAllPatients] = useState<Patient[]>(INITIAL_PATIENTS);
@@ -410,6 +428,290 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const logout = () => {
     setIsLoggedIn(false);
     showToast('Déconnexion réussie', 'Votre session sécurisée a été clôturée.');
+  };
+
+  const registerDoctorCabinet = (data: DoctorRegistrationData) => {
+    const slug = (data.cabinetName || data.doctorName || 'cabinet')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .slice(0, 20);
+    const uniqueSuffix = Date.now().toString(36);
+    const newOrgId = `org-${slug}-${uniqueSuffix}`;
+    const newUserId = `usr-${slug}-owner-${uniqueSuffix}`;
+
+    const isTrial = data.subscriptionPlan !== 'annual_paid';
+    const todayStr = '2026-08-25';
+    const endStr = isTrial ? '2026-09-08' : '2027-08-25';
+
+    const doctorDisplayName = data.doctorName.trim().startsWith('Dr')
+      ? data.doctorName.trim()
+      : `Dr. ${data.doctorName.trim()}`;
+
+    const newOrg: Organization = {
+      id: newOrgId,
+      name: data.cabinetName.trim() || `Cabinet ${doctorDisplayName}`,
+      slug: slug || 'cabinet-medical',
+      speciality: data.speciality || 'Médecine Générale',
+      city: data.city || 'Casablanca',
+      address: data.address || `${data.city || 'Casablanca'}, Maroc`,
+      phone: data.phone || '+212 5 22 00 00 00',
+      email: data.email,
+      ice: data.ice || '003999999000011',
+      inpe: data.inpe || '8000000000',
+      cnom: data.cnom || '20000',
+      plan: 'MEDICAL_OS_STANDARD',
+      priceMadPerYear: 3000,
+      subscriptionStatus: isTrial ? 'trial' : 'active',
+      subscriptionStart: todayStr,
+      subscriptionEnd: endStr,
+      isAutoRenew: true,
+      storageUsedMb: 14,
+      storageMaxMb: 50000,
+      backupStatus: 'healthy',
+      lastBackupDate: `${todayStr} 04:00 (Certifié CNDP)`,
+      cndpDeclaration: `CNDP-D-M-${Math.floor(100 + Math.random() * 900)}/2026`
+    };
+
+    const newUser: UserAccount = {
+      id: newUserId,
+      organizationId: newOrgId,
+      role: 'DOCTOR_OWNER',
+      roleLabel: 'Médecin Titulaire (Propriétaire)',
+      name: doctorDisplayName,
+      email: data.email,
+      phone: data.phone,
+      status: 'active',
+      mfaEnabled: true,
+      createdAt: todayStr,
+      lastLogin: `${todayStr} 12:00`,
+      permissions: {
+        canViewMedicalRecords: true,
+        canEditMedicalRecords: true,
+        canViewSensitiveDiagnoses: true,
+        canViewPrivateDoctorNotes: true,
+        canPrescribe: true,
+        canGenerateCertificates: true,
+        canManageAppointments: true,
+        canManageWaitingRoom: true,
+        canManagePayments: true,
+        canViewFinancials: true,
+        canExportData: true,
+        canDeleteRecords: true,
+        canManageUsers: true,
+        canViewAuditLogs: true,
+        canAccessTechnicalAdmin: false
+      }
+    };
+
+    const newPracticeSettings: PracticeSettings = {
+      cabinet: {
+        nom: newOrg.name,
+        adresse: data.address || `${data.city || 'Casablanca'}, Maroc`,
+        codePostal: '20000',
+        ville: data.city || 'Casablanca',
+        pays: 'Royaume du Maroc',
+        telephone: data.phone,
+        email: data.email,
+        ice: data.ice || '003999999000011',
+        identifiantFiscal: `IF-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        patente: `PAT-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        horaires: 'Lundi - Vendredi: 8h30 à 18h30 · Samedi: 9h00 à 13h00'
+      },
+      medecin: {
+        civilite: 'Dr',
+        prenom: data.doctorName.trim().split(' ').slice(0, -1).join(' ') || data.doctorName.trim(),
+        nom: data.doctorName.trim().split(' ').slice(-1).join(' ') || '',
+        specialite: data.speciality || 'Médecine Générale',
+        numeroInpe: data.inpe || '8000000000',
+        numeroCnom: data.cnom || '20000',
+        secteur: 'Secteur Libéral Conventionné AMO',
+        signatureUrl: ''
+      },
+      tarifs: {
+        secteur: 'Secteur Conventionné AMO',
+        consultationAdulte: 250,
+        consultationEnfant: 250,
+        ecg: 200,
+        visiteDomicile: 500,
+        certificat: 100
+      },
+      documentSettings: {
+        enteteTexte: `${doctorDisplayName} — Spécialiste en ${data.speciality || 'Médecine Générale'} · ${data.city || 'Maroc'}`,
+        piedDePage: `${newOrg.name} · ICE : ${data.ice || '003999999000011'} · ${data.city || 'Maroc'} · N° INPE : ${data.inpe || '8000000000'} · Conforme Loi 09-08 & AMO`,
+        afficherTampon: true,
+        afficherLogo: true
+      },
+      privacyPolicy: {
+        responsableTraitement: doctorDisplayName,
+        qualiteResponsable: `Médecin Responsable du Cabinet (${data.city || 'Maroc'})`,
+        numeroInpe: data.inpe || '8000000000',
+        numeroCnom: data.cnom || '20000',
+        statutDeclarationCndp: 'Récépissé de déclaration obtenu',
+        numeroRecepisseCndp: `D-M-${Math.floor(500 + Math.random() * 500)}/2026`,
+        dateDeclarationCndp: todayStr,
+        contactDpoEmail: data.email,
+        contactDpoTel: data.phone,
+        finalitesTraitement: [
+          'Gestion des dossiers médicaux informatisés et suivi thérapeutique',
+          'Prescriptions médicales et feuilles de soins AMO (CNSS, CNOPS)',
+          'Protection et traçabilité des données de santé (Loi 09-08)'
+        ],
+        destinatairesAutorises: [
+          `${doctorDisplayName} (Médecin Titulaire)`,
+          'Personnel de secrétariat sous secret professionnel',
+          'Organismes de couverture médicale AMO'
+        ],
+        droitsPatients: [
+          'Droit d’accès, de rectification et de portabilité',
+          'Droit d’opposition pour motif légitime'
+        ],
+        texteAfficheSalleAttente: 'Conformément à la loi 09-08, vos données médicales sont strictement protégées et chiffrées.',
+        delaiConservationDossiers: '20 ans après la dernière consultation (28 ans pour les mineurs)'
+      }
+    };
+
+    // Welcome sample patient for this cabinet
+    const welcomePatient: Patient = {
+      id: `pat-${newOrgId}-1`,
+      organizationId: newOrgId,
+      nom: 'BENJELLOUN',
+      prenom: 'Karim',
+      sexe: 'M',
+      dateNaissance: '1992-06-15',
+      age: 34,
+      telephone: '+212 6 61 99 88 77',
+      email: 'karim.benjelloun@gmail.com',
+      adresse: `Avenue Hassan II, ${data.city || 'Casablanca'}`,
+      ville: data.city || 'Casablanca',
+      codePostal: '20000',
+      cin: 'BK712903',
+      numeroAmo: '1928374650',
+      organismeAssurance: 'AMO CNSS',
+      numAffiliationMutuelle: 'CNSS-883719',
+      groupeSanguin: 'A+',
+      medecinTraitant: true,
+      statut: 'Actif',
+      allergies: ['Aucune allergie connue'],
+      antecedents: {
+        medicaux: ['Bilan de santé annuel'],
+        chirurgicaux: ['Aucun'],
+        familiaux: ['Diabète Type 2 (Mère)']
+      },
+      traitementsActuels: [],
+      ald: false,
+      notesGenerales: 'Dossier patient initialisé lors de l’ouverture du cabinet.',
+      notesConfidentiellesMedecin: 'Première consultation d’accueil.'
+    };
+
+    setOrganizations((prev) => [newOrg, ...prev]);
+    setUsers((prev) => [newUser, ...prev]);
+    setAllPatients((prev) => [welcomePatient, ...prev]);
+    setSettings(newPracticeSettings);
+    setCurrentOrgId(newOrgId);
+    setCurrentUserId(newUserId);
+    setIsLoggedIn(true);
+    setSelectedPatientId(welcomePatient.id);
+    setSessionMinutesRemaining(30);
+
+    setWolfMetrics((prev) => ({
+      ...prev,
+      totalTenants: prev.totalTenants + 1,
+      activePaidTenants: isTrial ? prev.activePaidTenants : prev.activePaidTenants + 1,
+      trialTenants: isTrial ? prev.trialTenants + 1 : prev.trialTenants,
+      arrTotalMAD: isTrial ? prev.arrTotalMAD : prev.arrTotalMAD + 3000
+    }));
+
+    const newAudit: AuditLogEntry = {
+      id: `log-reg-${Date.now()}`,
+      organizationId: newOrgId,
+      timestamp: `${todayStr} 12:00:00`,
+      userId: newUserId,
+      userName: newUser.name,
+      userRole: 'DOCTOR_OWNER',
+      actionType: 'CREATION_PATIENT',
+      categorie: 'Sécurité & Accès',
+      details: `Création du cabinet médical : ${newOrg.name} (${data.speciality} · ${data.city}). ICE: ${newOrg.ice}. Statut: ${isTrial ? 'Essai gratuit 14j' : 'Licence active (3 000 MAD/an)'}.`,
+      ipAddress: '196.200.180.45',
+      hashIntegrite: generateAuditHash(newOrgId)
+    };
+    setAllAuditLogs((prev) => [newAudit, ...prev]);
+
+    setIsRegisterModalOpen(false);
+    setCurrentTab('dashboard');
+    showToast(
+      'Cabinet médical créé avec succès !',
+      `Bienvenue ${newUser.name}. Votre espace sécurisé est prêt (ICE: ${newOrg.ice} · Conformité CNDP & AMO).`
+    );
+
+    return { orgId: newOrgId, userId: newUserId };
+  };
+
+  const registerSecretary = (data: SecretaryRegistrationData) => {
+    const targetOrg = organizations.find((o) => o.id === data.organizationId) || organizations[0];
+    const newUserId = `usr-sec-${Date.now().toString(36)}`;
+    const todayStr = '2026-08-25';
+
+    const newUser: UserAccount = {
+      id: newUserId,
+      organizationId: targetOrg.id,
+      role: 'SECRETARY',
+      roleLabel: 'Secrétaire Médicale (Accueil & Facturation)',
+      name: data.name.trim(),
+      email: data.email,
+      phone: data.phone,
+      status: 'active',
+      mfaEnabled: true,
+      createdAt: todayStr,
+      lastLogin: `${todayStr} 12:00`,
+      permissions: {
+        canViewMedicalRecords: true,
+        canEditMedicalRecords: false,
+        canViewSensitiveDiagnoses: false,
+        canViewPrivateDoctorNotes: false,
+        canPrescribe: false,
+        canGenerateCertificates: false,
+        canManageAppointments: true,
+        canManageWaitingRoom: true,
+        canManagePayments: true,
+        canViewFinancials: true,
+        canExportData: false,
+        canDeleteRecords: false,
+        canManageUsers: false,
+        canViewAuditLogs: false,
+        canAccessTechnicalAdmin: false
+      }
+    };
+
+    setUsers((prev) => [newUser, ...prev]);
+    setCurrentOrgId(targetOrg.id);
+    setCurrentUserId(newUserId);
+    setIsLoggedIn(true);
+    setSessionMinutesRemaining(30);
+
+    const newAudit: AuditLogEntry = {
+      id: `log-regsec-${Date.now()}`,
+      organizationId: targetOrg.id,
+      timestamp: `${todayStr} 12:00:00`,
+      userId: newUserId,
+      userName: newUser.name,
+      userRole: 'SECRETARY',
+      actionType: 'CONNEXION_UTILISATEUR',
+      categorie: 'Sécurité & Accès',
+      details: `Inscription de la secrétaire ${newUser.name} rattachée au cabinet : ${targetOrg.name}.`,
+      ipAddress: '196.200.180.45',
+      hashIntegrite: generateAuditHash(newUserId)
+    };
+    setAllAuditLogs((prev) => [newAudit, ...prev]);
+
+    setIsRegisterModalOpen(false);
+    setCurrentTab('dashboard');
+    showToast(
+      'Compte secrétaire créé !',
+      `Bienvenue ${newUser.name}. Vous êtes rattachée au ${targetOrg.name}.`
+    );
+
+    return { userId: newUserId };
   };
 
   const switchOrganizationAndUser = (orgId: string, userId?: string) => {
@@ -1263,6 +1565,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoggedIn,
         login,
         logout,
+        registerDoctorCabinet,
+        registerSecretary,
+        isRegisterModalOpen,
+        setIsRegisterModalOpen,
+        registerModalTab,
+        setRegisterModalTab,
+        openRegisterModal,
         switchOrganizationAndUser,
         sessionMinutesRemaining,
         extendSession,

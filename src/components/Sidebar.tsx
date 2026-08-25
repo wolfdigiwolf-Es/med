@@ -21,7 +21,9 @@ import {
   Building2,
   X,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  UserPlus,
+  UserCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { NavigationTab } from '../types';
@@ -44,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseM
   const {
     currentTab,
     setCurrentTab,
+    openRegisterModal,
     waitingRoom,
     appointments,
     currentOrganization,
@@ -127,11 +130,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseM
           >
             <div className="flex items-center gap-2">
               <Globe className="w-3.5 h-3.5 text-blue-200 group-hover:scale-110 transition-transform" />
-              <span>Site Public & Landing SaaS</span>
+              <span>Site Public & Landing</span>
             </div>
             <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded-full font-bold">
               🇲🇦 3 000 DH
             </span>
+          </button>
+
+          <button
+            onClick={() => openRegisterModal('doctor')}
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200"
+          >
+            <div className="flex items-center gap-2">
+              <UserPlus className="w-3.5 h-3.5 text-blue-600" />
+              <span>+ Inscription Médecin / Secrétaire</span>
+            </div>
           </button>
 
           <button

@@ -1,5 +1,6 @@
 export type NavigationTab =
   | 'landing'
+  | 'register'
   | 'dashboard'
   | 'patients'
   | 'patient-detail'
@@ -16,6 +17,29 @@ export type NavigationTab =
   | 'settings'
   | 'support'
   | 'wolf-admin';
+
+export interface DoctorRegistrationData {
+  cabinetName: string;
+  doctorName: string;
+  speciality: string;
+  city: string;
+  address: string;
+  phone: string;
+  email: string;
+  ice: string; // 15 chiffres marocains
+  inpe: string;
+  cnom: string;
+  password?: string;
+  subscriptionPlan?: 'trial' | 'annual_paid';
+}
+
+export interface SecretaryRegistrationData {
+  name: string;
+  email: string;
+  phone: string;
+  password?: string;
+  organizationId: string;
+}
 
 export type OrganismeAssuranceMaroc =
   | 'AMO CNSS'

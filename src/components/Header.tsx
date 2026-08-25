@@ -45,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
     switchOrganizationAndUser,
     sessionMinutesRemaining,
     extendSession,
+    openRegisterModal,
     waitingRoom
   } = useApp();
 
@@ -132,7 +133,29 @@ export const Header: React.FC<HeaderProps> = ({
                 })}
               </div>
 
-              <div className="mt-2 pt-2 border-t border-slate-100">
+              <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                <button
+                  onClick={() => {
+                    openRegisterModal('doctor');
+                    setIsTenantMenuOpen(false);
+                  }}
+                  className="w-full text-left p-2 rounded-lg text-xs bg-blue-50 text-blue-800 font-bold flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                  <span>+ Créer un Nouveau Cabinet (Médecin)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    openRegisterModal('secretary');
+                    setIsTenantMenuOpen(false);
+                  }}
+                  className="w-full text-left p-2 rounded-lg text-xs bg-indigo-50 text-indigo-800 font-bold flex items-center gap-2 hover:bg-indigo-100 cursor-pointer"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>+ Inscrire une Secrétaire Médicale</span>
+                </button>
+
                 <button
                   onClick={() => {
                     setCurrentTab('wolf-admin');

@@ -4,12 +4,14 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { CommandPalette } from './components/CommandPalette';
 import { PrintModal } from './components/PrintModal';
+import { RegisterModal } from './components/RegisterModal';
 import { NewPatientModal } from './components/NewPatientModal';
 import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewDocumentModal } from './components/NewDocumentModal';
 
 // Views
 import { LandingPageView } from './views/LandingPageView';
+import { RegisterView } from './views/RegisterView';
 import { DashboardView } from './views/DashboardView';
 import { PatientsView } from './views/PatientsView';
 import { PatientDetailView } from './views/PatientDetailView';
@@ -39,6 +41,8 @@ const AppContent: React.FC = () => {
 
   const renderCurrentView = () => {
     switch (currentTab) {
+      case 'register':
+        return <RegisterView />;
       case 'dashboard':
         return (
           <DashboardView
@@ -97,6 +101,7 @@ const AppContent: React.FC = () => {
         <LandingPageView />
 
         {/* Global Modals */}
+        <RegisterModal />
         <CommandPalette />
         <PrintModal />
         <NewPatientModal isOpen={isNewPatientOpen} onClose={() => setIsNewPatientOpen(false)} />
@@ -173,6 +178,7 @@ const AppContent: React.FC = () => {
       </div>
 
       {/* Global Modals */}
+      <RegisterModal />
       <CommandPalette />
       <PrintModal />
       <NewPatientModal isOpen={isNewPatientOpen} onClose={() => setIsNewPatientOpen(false)} />
