@@ -39,14 +39,14 @@ export const ConsultationView: React.FC = () => {
 
   // Draft state
   const [motif, setMotif] = useState(
-    activeConsultationDraft?.motif || 'Syndrome fébrile et toux productive'
+    activeConsultationDraft?.motif || 'Consultation de contrôle & bilan médical'
   );
   const [vitals, setVitals] = useState<Vitals>({
     tensionSystolique: activeConsultationDraft?.constantes?.tensionSystolique || 120,
     tensionDiastolique: activeConsultationDraft?.constantes?.tensionDiastolique || 80,
-    temperature: activeConsultationDraft?.constantes?.temperature || 37.2,
-    poids: activeConsultationDraft?.constantes?.poids || currentPatient.poidsRef || 65,
-    taille: activeConsultationDraft?.constantes?.taille || currentPatient.tailleRef || 170,
+    temperature: activeConsultationDraft?.constantes?.temperature || 37.0,
+    poids: activeConsultationDraft?.constantes?.poids || currentPatient?.poidsRef || 65,
+    taille: activeConsultationDraft?.constantes?.taille || currentPatient?.tailleRef || 170,
     frequenceCardiaque: activeConsultationDraft?.constantes?.frequenceCardiaque || 75,
     saturationO2: activeConsultationDraft?.constantes?.saturationO2 || 99,
     glycemie: activeConsultationDraft?.constantes?.glycemie || 0.95
@@ -157,6 +157,28 @@ export const ConsultationView: React.FC = () => {
 
     setCurrentTab('patient-detail');
   };
+
+  if (!currentPatient) {
+    return (
+      <div className="p-6 md:p-12 max-w-xl mx-auto my-12 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4 animate-in fade-in">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+          <Stethoscope className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-extrabold text-slate-900">Aucun dossier patient sélectionné</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          Pour démarrer une consultation, rédiger une ordonnance ou saisir des constantes, veuillez d'abord créer votre premier dossier patient.
+        </p>
+        <div className="pt-2 flex justify-center gap-3">
+          <button
+            onClick={() => setCurrentTab('patients')}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+          >
+            Accéder aux dossiers patients
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto animate-in fade-in">

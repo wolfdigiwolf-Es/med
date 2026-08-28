@@ -51,15 +51,19 @@ export const CertificatesView: React.FC = () => {
   const [titre, setTitre] = useState(getPresetTitle());
 
   const generateDefaultText = (type: CertificateType, patient: typeof selectedPatient) => {
+    if (!patient) {
+      return "Je soussigné, Docteur en médecine, certifie avoir examiné ce jour le patient susnommé et atteste des constatations médicales ci-après.";
+    }
+    const doctorNom = settings?.medecin?.nom ? `${settings.medecin.prenom} ${settings.medecin.nom}` : 'Dr Yassine EL QYAMI';
     switch (type) {
       case 'arret_travail':
-        return `Je soussigné, Dr Karim AHMED, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom.toUpperCase()} ${patient.prenom} (né(e) le ${patient.dateNaissance}) et constate un état de santé justifiant un arrêt de travail à titre thérapeutique pour une durée de ${dureeJours} jours, du 25/08/2026 au 28/08/2026 inclus.\nSorties autorisées : ${sortiesAutorisees} (horaires réglementaires 10h-12h et 16h-18h).`;
+        return `Je soussigné, ${doctorNom}, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom?.toUpperCase() || ''} ${patient.prenom || ''} (né(e) le ${patient.dateNaissance || '—'}) et constate un état de santé justifiant un arrêt de travail à titre thérapeutique pour une durée de ${dureeJours} jours, du ${date} au ... inclus.\nSorties autorisées : ${sortiesAutorisees} (horaires réglementaires).`;
       case 'aptitude_sport':
-        return `Je soussigné, Dr Karim AHMED, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom.toUpperCase()} ${patient.prenom} (né(e) le ${patient.dateNaissance}) et n'avoir pas constaté à ce jour de contre-indication clinique apparente à la pratique de : ${sportPratique}.\nExamen cardio-vasculaire au repos satisfaisant.`;
+        return `Je soussigné, ${doctorNom}, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom?.toUpperCase() || ''} ${patient.prenom || ''} (né(e) le ${patient.dateNaissance || '—'}) et n'avoir pas constaté à ce jour de contre-indication clinique apparente à la pratique de : ${sportPratique}.\nExamen cardio-vasculaire au repos satisfaisant.`;
       case 'scolaire':
-        return `Je soussigné, Dr Karim AHMED, certifie que l'état de santé de l'élève ${patient.nom.toUpperCase()} ${patient.prenom} nécessite une dispense d'éducation physique et sportive (EPS) pour une durée de 8 jours à compter de ce jour.`;
+        return `Je soussigné, ${doctorNom}, certifie que l'état de santé de l'élève ${patient.nom?.toUpperCase() || ''} ${patient.prenom || ''} nécessite une dispense d'éducation physique et sportive (EPS) pour une durée de 8 jours à compter de ce jour.`;
       default:
-        return `Je soussigné, Dr Karim AHMED, docteur en médecine, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom.toUpperCase()} ${patient.prenom} et atteste que son état de santé est compatible avec la vie en collectivité.`;
+        return `Je soussigné, ${doctorNom}, docteur en médecine, certifie avoir examiné ce jour ${patient.sexe === 'F' ? 'Mme' : 'M.'} ${patient.nom?.toUpperCase() || ''} ${patient.prenom || ''} et atteste que son état de santé est compatible avec la vie en collectivité.`;
     }
   };
 
@@ -94,12 +98,34 @@ export const CertificatesView: React.FC = () => {
 
     openPrintPreview('certificate', titre, {
       titre,
-      patientNomComplet: `${selectedPatient.prenom} ${selectedPatient.nom}`,
-      patientAge: selectedPatient.age,
+      patientNomComplet: `${selectedPatient?.prenom || ''} ${selectedPatient?.nom || ''}`,
+      patientAge: selectedPatient?.age || 0,
       date,
       texteContenu
     });
   };
+
+  if (!selectedPatient) {
+    return (
+      <div className="p-6 md:p-12 max-w-xl mx-auto my-12 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4 animate-in fade-in">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+          <FileText className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-extrabold text-slate-900">Aucun dossier patient sélectionné</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          Pour rédiger un certificat médical conforme ou un arrêt de travail, veuillez d'abord créer ou sélectionner un dossier patient.
+        </p>
+        <div className="pt-2 flex justify-center gap-3">
+          <button
+            onClick={() => setCurrentTab('patients')}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer"
+          >
+            Accéder aux dossiers patients
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto animate-in fade-in">

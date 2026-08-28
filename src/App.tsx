@@ -8,10 +8,12 @@ import { RegisterModal } from './components/RegisterModal';
 import { NewPatientModal } from './components/NewPatientModal';
 import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewDocumentModal } from './components/NewDocumentModal';
+import { AccountCredentialsModal } from './components/AccountCredentialsModal';
 
 // Views
 import { LandingPageView } from './views/LandingPageView';
 import { RegisterView } from './views/RegisterView';
+import { LoginView } from './views/LoginView';
 import { DashboardView } from './views/DashboardView';
 import { PatientsView } from './views/PatientsView';
 import { PatientDetailView } from './views/PatientDetailView';
@@ -31,13 +33,17 @@ import { WolfAdminView } from './views/WolfAdminView';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const AppContent: React.FC = () => {
-  const { currentTab, toasts, dismissToast } = useApp();
+  const { currentTab, toasts, dismissToast, isLoggedIn } = useApp();
 
   // Modals state
   const [isNewPatientOpen, setIsNewPatientOpen] = useState(false);
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
   const [isNewDocumentOpen, setIsNewDocumentOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  if (!isLoggedIn && currentTab !== 'landing' && currentTab !== 'register') {
+    return <LoginView />;
+  }
 
   const renderCurrentView = () => {
     switch (currentTab) {
@@ -181,6 +187,7 @@ const AppContent: React.FC = () => {
       <RegisterModal />
       <CommandPalette />
       <PrintModal />
+      <AccountCredentialsModal />
       <NewPatientModal isOpen={isNewPatientOpen} onClose={() => setIsNewPatientOpen(false)} />
       <NewAppointmentModal
         isOpen={isNewAppointmentOpen}

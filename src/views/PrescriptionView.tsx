@@ -135,6 +135,28 @@ export const PrescriptionView: React.FC = () => {
     });
   };
 
+  if (!selectedPatient) {
+    return (
+      <div className="p-6 md:p-12 max-w-xl mx-auto my-12 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4 animate-in fade-in">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+          <FileText className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-extrabold text-slate-900">Aucun dossier patient sélectionné</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          Pour rédiger et imprimer une ordonnance conforme, veuillez d'abord créer ou sélectionner un dossier patient.
+        </p>
+        <div className="pt-2 flex justify-center gap-3">
+          <button
+            onClick={() => setCurrentTab('patients')}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer"
+          >
+            Accéder aux dossiers patients
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto animate-in fade-in">
       {/* Header */}

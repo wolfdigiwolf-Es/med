@@ -9,12 +9,13 @@ import {
   ShieldCheck,
   FileBadge,
   Lock,
-  ArrowRight
+  ArrowRight,
+  KeyRound
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const SettingsView: React.FC = () => {
-  const { settings, updateSettings, setCurrentTab, showToast } = useApp();
+  const { settings, updateSettings, setCurrentTab, showToast, openCredentialsModal } = useApp();
 
   const [localSettings, setLocalSettings] = useState(settings);
 
@@ -40,6 +41,14 @@ export const SettingsView: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <button
             type="button"
+            onClick={openCredentialsModal}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+          >
+            <KeyRound className="w-4 h-4 text-teal-600" />
+            <span>Modifier Login & Mot de Passe</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setCurrentTab('security-compliance')}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
           >
@@ -49,7 +58,7 @@ export const SettingsView: React.FC = () => {
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Enregistrer</span>

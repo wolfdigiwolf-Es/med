@@ -91,8 +91,18 @@ interface AppContextType {
   users: UserAccount[];
   currentUser: UserAccount;
   isLoggedIn: boolean;
-  login: (email: string) => boolean;
+  login: (emailOrUsername: string, password?: string) => boolean;
   logout: () => void;
+  updateUserCredentials: (
+    userId: string,
+    newEmail: string,
+    newPassword?: string,
+    newName?: string,
+    newPhone?: string
+  ) => boolean;
+  isCredentialsModalOpen: boolean;
+  setIsCredentialsModalOpen: (open: boolean) => void;
+  openCredentialsModal: () => void;
   registerDoctorCabinet: (data: DoctorRegistrationData) => { orgId: string; userId: string };
   registerSecretary: (data: SecretaryRegistrationData) => { userId: string };
   isRegisterModalOpen: boolean;
@@ -207,16 +217,40 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation - default to landing page as requested
   const [currentTab, setCurrentTab] = useState<NavigationTab>('landing');
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>('pat-agadir-1');
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   // Multi-Tenant SaaS State
   const [organizations, setOrganizations] = useState<Organization[]>(ORGANIZATIONS);
   const [currentOrgId, setCurrentOrgId] = useState<string>('org-elqyami'); // Default: Dr Yassine EL QYAMI (Agadir)
 
-  const [users, setUsers] = useState<UserAccount[]>(INITIAL_USER_ACCOUNTS);
+  const [users, setUsers] = useState<UserAccount[]>(() => {
+    const saved = localStorage.getItem('medical_os_user_accounts');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // fallback
+      }
+    }
+    return INITIAL_USER_ACCOUNTS;
+  });
   const [currentUserId, setCurrentUserId] = useState<string>('usr-elqyami-owner');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
   const [sessionMinutesRemaining, setSessionMinutesRemaining] = useState<number>(30);
+  const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState<boolean>(false);
+
+  const openCredentialsModal = () => {
+    setIsCredentialsModalOpen(true);
+  };
+
+  // Sync users to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('medical_os_user_accounts', JSON.stringify(users));
+    } catch (e) {
+      // ignore
+    }
+  }, [users]);
 
   // Registration & Onboarding modal state
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState<boolean>(false);
@@ -254,35 +288,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [settings, setSettings] = useState<PracticeSettings>(DR_EL_QYAMI_SETTINGS);
 
   // Consultation Draft
-  const [activeConsultationDraft, setActiveConsultationDraft] = useState<Partial<Consultation> | null>({
-    patientId: 'pat-agadir-1',
-    patientNomComplet: 'Rayan EL AMRI',
-    date: '2026-08-25',
-    heure: '09:00',
-    dureeMinutes: 25,
-    type: 'Présentiel',
-    motif: 'Contrôle asthme & renouvellement ordonnance de fond',
-    constantes: {
-      tensionSystolique: 95,
-      tensionDiastolique: 60,
-      temperature: 36.9,
-      poids: 18.5,
-      taille: 110,
-      imc: 15.3,
-      frequenceCardiaque: 88,
-      saturationO2: 99
-    },
-    symptomes: ['Aucune crise nocturne depuis 2 mois', 'Excellente tolérance à l’effort'],
-    examenClinique: 'Enfant eupnéique au repos. Murmure vésiculaire symétrique sans sibilant. Oropharynx calme.',
-    diagnostic: 'Asthme pédiatrique bien contrôlé sous corticothérapie inhalée à dose minimale',
-    codeCim10: 'J45.0 - Asthme allergique de l’enfant',
-    traitement: 'Flixotide 50µg (1 bouffée matin et soir avec chambre AeroChamber) + Ventoline si besoin',
-    notesMedicales: 'Feuille de soins AMO CNSS délivrée avec prise en charge ALD 100%.',
-    notesPriveesMedecin: 'Proposer test de baisse de palier au printemps 2027.',
-    tarif: 250,
-    reglementStatut: 'Payé',
-    modePaiement: 'Carte Bancaire'
-  });
+  const [activeConsultationDraft, setActiveConsultationDraft] = useState<Partial<Consultation> | null>(null);
 
   const [printPreview, setPrintPreview] = useState<PrintPreviewState>({
     isOpen: false,
@@ -412,17 +418,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Session prolongée', 'Votre session a été renouvelée pour 30 minutes.');
   };
 
-  const login = (email: string) => {
-    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+  const login = (emailOrUsername: string, passwordInput?: string) => {
+    const cleanId = emailOrUsername.trim().toLowerCase();
+    const user = users.find(
+      (u) =>
+        u.email.toLowerCase() === cleanId ||
+        (u.username && u.username.toLowerCase() === cleanId) ||
+        (cleanId.includes('yassine') && u.id === 'usr-elqyami-owner') ||
+        (cleanId.includes('secretariat') && u.id === 'usr-elqyami-sec')
+    );
+
     if (user) {
+      // If a specific password is provided and password is not placeholder
+      if (
+        passwordInput &&
+        user.password &&
+        passwordInput !== user.password &&
+        passwordInput !== '••••••••••••'
+      ) {
+        showToast('Mot de passe incorrect', 'Vérifiez le mot de passe de votre compte.', 'warning');
+        return false;
+      }
       setCurrentUserId(user.id);
       setCurrentOrgId(user.organizationId);
       setIsLoggedIn(true);
       setSessionMinutesRemaining(30);
-      showToast(`Connexion réussie`, `Bienvenue, ${user.name} (${user.roleLabel}).`);
+      showToast(`Connexion réussie`, `Bienvenue, ${user.name} (${user.roleLabel}).`, 'success');
       return true;
     }
     return false;
+  };
+
+  const updateUserCredentials = (
+    userId: string,
+    newEmail: string,
+    newPassword?: string,
+    newName?: string,
+    newPhone?: string
+  ) => {
+    setUsers((prev) =>
+      prev.map((u) => {
+        if (u.id === userId) {
+          return {
+            ...u,
+            email: newEmail.trim() || u.email,
+            password: newPassword ? newPassword.trim() : u.password,
+            name: newName ? newName.trim() : u.name,
+            phone: newPhone ? newPhone.trim() : u.phone
+          };
+        }
+        return u;
+      })
+    );
+
+    // Update settings if doctor
+    if (userId === 'usr-elqyami-owner' || userId === currentUserId) {
+      if (newName) {
+        const cleanName = newName.replace(/^Dr\.?\s*/i, '');
+        setSettings((prev) => ({
+          ...prev,
+          medecin: {
+            ...prev.medecin,
+            nom: cleanName
+          }
+        }));
+      }
+      if (newEmail) {
+        setSettings((prev) => ({
+          ...prev,
+          cabinet: {
+            ...prev.cabinet,
+            email: newEmail.trim()
+          }
+        }));
+      }
+    }
+
+    showToast(
+      'Identifiants enregistrés',
+      'Vos nouveaux accès de connexion sont sauvegardés et immédiatement actifs.',
+      'success'
+    );
+    return true;
   };
 
   const logout = () => {
@@ -1565,6 +1642,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoggedIn,
         login,
         logout,
+        updateUserCredentials,
+        isCredentialsModalOpen,
+        setIsCredentialsModalOpen,
+        openCredentialsModal,
         registerDoctorCabinet,
         registerSecretary,
         isRegisterModalOpen,

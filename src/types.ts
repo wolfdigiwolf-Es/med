@@ -116,6 +116,8 @@ export interface UserAccount {
   roleLabel: string;
   name: string;
   email: string;
+  username?: string;
+  password?: string;
   phone: string;
   avatarUrl?: string;
   status: 'active' | 'disabled' | 'pending_2fa';

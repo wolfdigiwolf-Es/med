@@ -21,7 +21,15 @@ import {
   Eye,
   Check,
   RefreshCw,
-  Plus
+  Plus,
+  Database,
+  Copy,
+  Terminal,
+  Play,
+  CheckSquare,
+  Sparkles,
+  Layers,
+  FileCode
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import {
@@ -31,6 +39,7 @@ import {
   AccessUser,
   PatientConsent
 } from '../types';
+import { SUPABASE_RLS_SQL_CONTENT } from '../data/rlsSqlData';
 
 export const SecurityComplianceView: React.FC = () => {
   const {
@@ -53,8 +62,15 @@ export const SecurityComplianceView: React.FC = () => {
   } = useApp();
 
   const [activeSubTab, setActiveSubTab] = useState<
-    'acces' | 'audit' | 'export' | 'retention' | 'consentements' | 'politique' | 'integrite'
+    'acces' | 'audit' | 'export' | 'retention' | 'consentements' | 'politique' | 'integrite' | 'rls'
   >('acces');
+
+  // Supabase RLS State & Simulation
+  const [selectedRlsTable, setSelectedRlsTable] = useState<'patients' | 'consultations' | 'prescriptions' | 'all'>('patients');
+  const [rlsSimUserRole, setRlsSimUserRole] = useState<'DOCTOR_OWNER' | 'SECRETARY' | 'SUPER_ADMIN_TECH'>('DOCTOR_OWNER');
+  const [rlsSimTenantTarget, setRlsSimTenantTarget] = useState<'SAME_CABINET' | 'OTHER_CABINET'>('SAME_CABINET');
+  const [rlsSimAction, setRlsSimAction] = useState<'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE'>('SELECT');
+  const [copiedRlsSql, setCopiedRlsSql] = useState(false);
 
   // Audit filter state
   const [auditFilterQuery, setAuditFilterQuery] = useState('');
@@ -110,6 +126,71 @@ export const SecurityComplianceView: React.FC = () => {
     const matchType = consentFilterType === 'all' || cst.typeConsentement === consentFilterType;
     return matchText && matchType;
   });
+
+  const calculateRlsSimulation = () => {
+    if (rlsSimTenantTarget === 'OTHER_CABINET') {
+      return {
+        allowed: false,
+        status: '403 FORBIDDEN (0 rows)',
+        policy: 'REJET AUTOMATIQUE RLS',
+        explanation: 'Isolation multi-tenant étanche : l’utilisateur appartient à une organisation différente du patient. Le prédicat (organization_id = get_auth_user_organization_id()) évalue à FALSE.'
+      };
+    }
+
+    if (rlsSimUserRole === 'SUPER_ADMIN_TECH') {
+      return {
+        allowed: false,
+        status: '403 ACCESS DENIED (Zero Clinical Access)',
+        policy: 'REJET RBAC / RLS',
+        explanation: 'Conformité Loi 09-08 & Secret Médical : Le rôle technique Wolf Digital (SUPER_ADMIN_TECH) est strictement exclu des tables cliniques (patients, consultations, prescriptions).'
+      };
+    }
+
+    if (selectedRlsTable === 'prescriptions' && rlsSimAction === 'INSERT' && rlsSimUserRole === 'SECRETARY') {
+      return {
+        allowed: false,
+        status: '403 FORBIDDEN (WITH CHECK violation)',
+        policy: 'rls_prescriptions_insert',
+        explanation: 'Prescription illicite : Seul un médecin titulaire ou associé (DOCTOR_OWNER / DOCTOR_ASSOCIATE) dispose des prérogatives de prescription médicamenteuse.'
+      };
+    }
+
+    if (selectedRlsTable === 'consultations' && rlsSimAction === 'INSERT' && rlsSimUserRole === 'SECRETARY') {
+      return {
+        allowed: false,
+        status: '403 FORBIDDEN (WITH CHECK violation)',
+        policy: 'rls_consultations_insert',
+        explanation: 'Acte clinique restreint : Seul le médecin praticien peut créer et enregistrer une consultation médicale.'
+      };
+    }
+
+    if (rlsSimAction === 'DELETE' && rlsSimUserRole === 'SECRETARY') {
+      return {
+        allowed: false,
+        status: '403 FORBIDDEN',
+        policy: `rls_${selectedRlsTable === 'all' ? 'patients' : selectedRlsTable}_delete`,
+        explanation: 'Suppression / Archivage irréversible réservé exclusivement au Médecin Titulaire (DOCTOR_OWNER).'
+      };
+    }
+
+    return {
+      allowed: true,
+      status: '200 OK (AUTORISÉ)',
+      policy: `rls_${selectedRlsTable === 'all' ? 'patients' : selectedRlsTable}_${rlsSimAction.toLowerCase()}`,
+      explanation: 'Accès autorisé : Le token JWT authentifié correspond au même cabinet médical (organization_id) et respecte le rôle et les privilèges RBAC requis.'
+    };
+  };
+
+  const handleDownloadRlsSql = () => {
+    const element = document.createElement('a');
+    const file = new Blob([SUPABASE_RLS_SQL_CONTENT], { type: 'text/plain;charset=utf-8' });
+    element.href = URL.createObjectURL(file);
+    element.download = '20260828_medical_os_rls.sql';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    showToast('Fichier SQL téléchargé', 'Le script de migration Supabase RLS a été exporté (20260828_medical_os_rls.sql).');
+  };
 
   const handleCreateUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -258,6 +339,7 @@ export const SecurityComplianceView: React.FC = () => {
         <div className="flex items-center gap-1 mt-4 border-b border-slate-200 overflow-x-auto pb-px">
           {[
             { id: 'acces', label: 'Gestion des accès', icon: Key },
+            { id: 'rls', label: 'Politiques RLS Supabase', icon: Database },
             { id: 'audit', label: 'Journalisation & Audit', icon: FileCheck },
             { id: 'export', label: 'Export & Portabilité', icon: Download },
             { id: 'retention', label: 'Suppression & Rétention', icon: Trash2 },
@@ -1210,6 +1292,317 @@ export const SecurityComplianceView: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* 8. POLITIQUES RLS SUPABASE (PATIENTS, CONSULTATIONS, PRESCRIPTIONS) */}
+        {/* ======================================================== */}
+        {activeSubTab === 'rls' && (
+          <div className="space-y-6">
+            {/* Header / Intro Card */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base font-bold text-slate-900">
+                        Row Level Security (RLS) Supabase · PostgreSQL
+                      </h2>
+                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300">
+                        Actif & Forcé
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Isolation étanche par <code className="font-mono text-blue-600 bg-blue-50 px-1 py-0.5 rounded text-[11px]">organization_id</code> sur <code className="font-mono text-slate-700">patients</code>, <code className="font-mono text-slate-700">consultations</code> et <code className="font-mono text-slate-700">prescriptions</code>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(SUPABASE_RLS_SQL_CONTENT);
+                      setCopiedRlsSql(true);
+                      setTimeout(() => setCopiedRlsSql(false), 2500);
+                      showToast('SQL copié', 'Le script de sécurité RLS Supabase est dans votre presse-papier.');
+                    }}
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    {copiedRlsSql ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedRlsSql ? 'Copié !' : 'Copier le SQL'}</span>
+                  </button>
+                  <button
+                    onClick={handleDownloadRlsSql}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Télécharger migration .sql</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Multi-Tenant Architectural Principles Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+                    <Shield className="w-4 h-4 text-blue-600" />
+                    <span>Prédicat Server-Side Immuable</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    L’<code className="font-mono text-slate-800">organization_id</code> est extrait côté serveur via <code className="font-mono text-blue-700">get_auth_user_organization_id()</code>. Aucun paramètre client n'est pris pour acquis.
+                  </p>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+                    <Lock className="w-4 h-4 text-emerald-600" />
+                    <span>Zéro Visibilité Super Admin Tech</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Les tables cliniques excluent explicitement <code className="font-mono text-slate-800">SUPER_ADMIN_TECH</code> pour garantir le secret médical et la conformité Loi 09-08.
+                  </p>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+                    <CheckSquare className="w-4 h-4 text-indigo-600" />
+                    <span>Triggers de Sécurité Intégrés</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Chaque <code className="font-mono text-indigo-700">INSERT</code> écrase automatiquement <code className="font-mono text-slate-800">organization_id</code> avec le tenant authentifié par déclencheur PostgreSQL.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Live RLS Simulator */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-white shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                    <Play className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-white">
+                      Simulateur de Requête & Évaluation RLS en Direct
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Testez le comportement du moteur PostgreSQL / Supabase selon le rôle et le tenant
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
+                  Supabase Engine v15.1 · RLS Enabled
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300">Table Cible</label>
+                  <select
+                    value={selectedRlsTable}
+                    onChange={(e) => setSelectedRlsTable(e.target.value as any)}
+                    className="w-full mt-1.5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white font-mono"
+                  >
+                    <option value="patients">public.patients</option>
+                    <option value="consultations">public.consultations</option>
+                    <option value="prescriptions">public.prescriptions</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300">Rôle de l'Utilisateur Authentifié</label>
+                  <select
+                    value={rlsSimUserRole}
+                    onChange={(e) => setRlsSimUserRole(e.target.value as any)}
+                    className="w-full mt-1.5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white font-medium"
+                  >
+                    <option value="DOCTOR_OWNER">DOCTOR_OWNER (Médecin Titulaire)</option>
+                    <option value="SECRETARY">SECRETARY (Secrétaire Médicale)</option>
+                    <option value="SUPER_ADMIN_TECH">SUPER_ADMIN_TECH (Wolf Digital Admin)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300">Organisation Cible de la Donnée</label>
+                  <select
+                    value={rlsSimTenantTarget}
+                    onChange={(e) => setRlsSimTenantTarget(e.target.value as any)}
+                    className="w-full mt-1.5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white font-medium"
+                  >
+                    <option value="SAME_CABINET">Même Cabinet (organization_id identique)</option>
+                    <option value="OTHER_CABINET">Autre Cabinet (organization_id différent)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300">Opération SQL (Action)</label>
+                  <select
+                    value={rlsSimAction}
+                    onChange={(e) => setRlsSimAction(e.target.value as any)}
+                    className="w-full mt-1.5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white font-mono font-bold text-amber-400"
+                  >
+                    <option value="SELECT">SELECT (Lecture)</option>
+                    <option value="INSERT">INSERT (Création)</option>
+                    <option value="UPDATE">UPDATE (Modification)</option>
+                    <option value="DELETE">DELETE (Suppression)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Simulation Result Card */}
+              {(() => {
+                const sim = calculateRlsSimulation();
+                return (
+                  <div
+                    className={`p-4 rounded-xl border transition-all ${
+                      sim.allowed
+                        ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
+                        : 'bg-rose-950/40 border-rose-500/40 text-rose-200'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        {sim.allowed ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                        )}
+                        <span className="font-bold text-sm">
+                          Résultat Supabase : <span className="font-mono">{sim.status}</span>
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono bg-black/40 px-2.5 py-1 rounded border border-white/10">
+                        Règle appliquée : {sim.policy}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                      {sim.explanation}
+                    </p>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Table-by-Table RLS Policy Breakdown */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <FileCode className="w-4 h-4 text-blue-600" />
+                Matrice Détaillée des Politiques RLS Déployées
+              </h3>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* 1. Patients Table Card */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span className="font-mono font-bold text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                      public.patients
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      RLS FORCÉ
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">SELECT / INSERT / UPDATE</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Médecins et Secrétaires de l'organisation uniquement (<code className="font-mono text-blue-600">organization_id = auth.org_id</code>).
+                      </p>
+                    </div>
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">DELETE (Archivage)</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Réservé exclusivement au <code className="font-mono text-emerald-700">DOCTOR_OWNER</code>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Consultations Table Card */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span className="font-mono font-bold text-xs text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
+                      public.consultations
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      RLS FORCÉ
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">SELECT</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Médecins du cabinet + Secrétaire (métadonnées administratives et paiements).
+                      </p>
+                    </div>
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">INSERT / UPDATE</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Médecins uniquement (<code className="font-mono text-purple-700">doctor_id = auth.uid()</code>).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Prescriptions Table Card */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span className="font-mono font-bold text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                      public.prescriptions
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      RLS FORCÉ
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">SELECT</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Médecins et Secrétaires (pour impression et remise au patient).
+                      </p>
+                    </div>
+                    <div className="p-2 bg-slate-50 rounded border border-slate-100">
+                      <p className="font-bold text-slate-800 text-[11px]">INSERT / UPDATE</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Médecin prescripteur authentifié uniquement. Signature électronique consignée.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SQL Code Box with Syntax Highlighting Look */}
+            <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-lg">
+              <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-emerald-400" />
+                  <span className="font-mono text-xs text-slate-300 font-bold">
+                    supabase/migrations/20260828_medical_os_rls.sql
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(SUPABASE_RLS_SQL_CONTENT);
+                    setCopiedRlsSql(true);
+                    setTimeout(() => setCopiedRlsSql(false), 2500);
+                    showToast('SQL copié', 'Code copié avec succès.');
+                  }}
+                  className="text-slate-400 hover:text-white text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{copiedRlsSql ? 'Copié !' : 'Copier'}</span>
+                </button>
+              </div>
+
+              <pre className="p-5 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-96 leading-relaxed">
+                <code>{SUPABASE_RLS_SQL_CONTENT}</code>
+              </pre>
             </div>
           </div>
         )}

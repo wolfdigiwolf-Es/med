@@ -1,6 +1,6 @@
 {
-  "name": "MédiCabinet Pro",
-  "description": "MEDICAL OS par Wolf Digital - Logiciel SaaS de gestion de cabinet médical au Maroc (3 000 MAD/an), multi-tenant avec isolation stricte des données (RLS), conforme CNDP Loi 09-08 & AMO CNSS/CNOPS. Profil pilote : Dr Yassine EL QYAMI (Pédiatre Agadir, ICE: 003311669000022).",
+  "name": "World Medical Pro",
+  "description": "World Medical Pro — Logiciel médical tout-en-un nouvelle génération pour tous les médecins et spécialistes (Dentistes, Pédiatres, Gynécologues, Ophtalmologues, Cardiologues, Généralistes, Chirurgiens). Animations GSAP fluides, télémétrie 2D cinématique, gestion de cabinet, ordonnances sécurisées et conformité CNDP Loi 09-08.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

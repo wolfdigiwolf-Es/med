@@ -28,13 +28,13 @@ import {
 export const ORGANIZATIONS: Organization[] = [
   {
     id: 'org-elqyami',
-    name: 'Cabinet de Pédiatrie & Néonatalogie Dr Yassine EL QYAMI',
-    slug: 'pediatrie-elqyami-agadir',
+    name: 'Cabinet de Pédiatrie & Néonatalogie — Dr. Yassine EL QYAMI',
+    slug: 'cabinet-pediatrie-dr-yassine-elqyami',
     speciality: 'Pédiatrie, Néonatalogie & Suivi de Développement',
     city: 'Agadir',
-    address: 'Boulevard Hassan II, Résidence Médicale Al Manar, 3ème étage, Apt 7',
+    address: 'Résidence Médicale, 3ème étage, Apt 7',
     phone: '+212 5 28 84 10 20',
-    email: 'contact@pediatrie-elqyami-agadir.ma',
+    email: 'dr.yassine.elqyami@gmail.com',
     ice: '003311669000022',
     inpe: '8029381029',
     cnom: '18492',
@@ -112,9 +112,11 @@ export const INITIAL_USER_ACCOUNTS: UserAccount[] = [
     id: 'usr-elqyami-owner',
     organizationId: 'org-elqyami',
     role: 'DOCTOR_OWNER',
-    roleLabel: 'Médecin Titulaire (Propriétaire du Cabinet)',
-    name: 'Dr Yassine EL QYAMI',
-    email: 'dr.elqyami@pediatrie-elqyami-agadir.ma',
+    roleLabel: 'Médecin Pédiatre Titulaire',
+    name: 'Dr. Yassine EL QYAMI',
+    email: 'dr.yassine.elqyami@gmail.com',
+    username: 'dr.yassine',
+    password: 'Yassine@Pediatrie2026',
     phone: '+212 6 61 84 90 20',
     status: 'active',
     mfaEnabled: true,
@@ -143,8 +145,10 @@ export const INITIAL_USER_ACCOUNTS: UserAccount[] = [
     organizationId: 'org-elqyami',
     role: 'SECRETARY',
     roleLabel: 'Secrétaire Médicale',
-    name: 'Soukaina CHAMI',
-    email: 'secretariat@pediatrie-elqyami-agadir.ma',
+    name: 'Soukaina CHAMI (Secrétariat)',
+    email: 'secretariat@cabinet-pediatrie.ma',
+    username: 'secretariat',
+    password: 'Secretariat2026!',
     phone: '+212 6 72 10 34 89',
     status: 'active',
     mfaEnabled: true,
@@ -236,13 +240,13 @@ export const INITIAL_USER_ACCOUNTS: UserAccount[] = [
 
 export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
   cabinet: {
-    nom: 'Cabinet de Pédiatrie & Néonatalogie Dr Yassine EL QYAMI',
-    adresse: 'Boulevard Hassan II, Résidence Médicale Al Manar, 3ème étage, Apt 7',
+    nom: 'Cabinet de Pédiatrie & Néonatalogie — Dr. Yassine EL QYAMI',
+    adresse: 'Résidence Médicale, 3ème étage, Apt 7',
     codePostal: '80000',
     ville: 'Agadir',
     pays: 'Royaume du Maroc',
     telephone: '+212 5 28 84 10 20',
-    email: 'contact@pediatrie-elqyami-agadir.ma',
+    email: 'dr.yassine.elqyami@gmail.com',
     ice: '003311669000022',
     identifiantFiscal: '50192837',
     patente: '48201948',
@@ -255,7 +259,7 @@ export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
     specialite: "Pédiatrie, Néonatalogie & Développement de l'Enfant",
     numeroInpe: '8029381029',
     numeroCnom: '18492',
-    secteur: 'Pédiatrie Libérale Conventionnée AMO (Agadir)',
+    secteur: 'Pédiatrie Libérale Conventionnée AMO',
     signatureUrl: ''
   },
   tarifs: {
@@ -267,20 +271,20 @@ export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
     certificat: 100
   },
   documentSettings: {
-    enteteTexte: "Dr Yassine EL QYAMI — Pédiatre à Agadir · Spécialiste des Maladies de l'Enfant et du Nouveau-né (Lauréat Faculté de Médecine)",
-    piedDePage: 'Cabinet de Pédiatrie Dr EL QYAMI · ICE : 003311669000022 · Agadir · N° INPE : 8029381029 · N° Ordre CNOM : 18492 · Conforme Loi 09-08',
+    enteteTexte: "Cabinet de Pédiatrie — Dr. Yassine EL QYAMI · Spécialiste des Maladies de l'Enfant et du Nouveau-né",
+    piedDePage: 'Cabinet de Pédiatrie Dr. Yassine EL QYAMI · Ordonnance Médicale Sécurisée · Conforme Loi 09-08 CNDP',
     afficherTampon: true,
     afficherLogo: true
   },
   privacyPolicy: {
-    responsableTraitement: 'Dr Yassine EL QYAMI',
-    qualiteResponsable: 'Médecin Pédiatre Responsable du Cabinet Médical (Agadir)',
+    responsableTraitement: 'Médecin Pédiatre Titulaire',
+    qualiteResponsable: 'Médecin Pédiatre Responsable du Cabinet Médical',
     numeroInpe: '8029381029',
     numeroCnom: '18492',
     statutDeclarationCndp: 'Récépissé de déclaration obtenu',
     numeroRecepisseCndp: 'D-M-588/2026',
     dateDeclarationCndp: '2026-02-10',
-    contactDpoEmail: 'dpo@pediatrie-elqyami-agadir.ma',
+    contactDpoEmail: 'dpo@cabinet-pediatrie.ma',
     contactDpoTel: '+212 5 28 84 10 20',
     finalitesTraitement: [
       'Suivi pédiatrique, carnet de vaccination national, courbes de croissance OMS et néonatalogie',
@@ -289,7 +293,7 @@ export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
       'Protection et confidentialité stricte des données médicales des mineurs (Loi 09-08)'
     ],
     destinatairesAutorises: [
-      'Dr Yassine EL QYAMI (Pédiatre Titulaire)',
+      'Médecin Pédiatre Titulaire',
       'Personnel paramédical habilité sous secret médical',
       "Parents ou tuteurs légaux de l'enfant",
       'Organismes AMO (CNSS, CNOPS, Mutuelles)'
@@ -301,7 +305,7 @@ export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
       "Droit d'information sur les finalités pédiatriques"
     ],
     delaiConservationDossiers: "Conservation jusqu'à l'âge de 28 ans du patient (Dossier pédiatrique)",
-    texteAfficheSalleAttente: "Conformément à la loi n° 09-08, les données médicales de votre enfant font l'objet d'un traitement sécurisé sous récépissé CNDP n° D-M-588/2026 par le Dr Yassine EL QYAMI (ICE: 003311669000022)."
+    texteAfficheSalleAttente: "Conformément à la loi n° 09-08, les données médicales de votre enfant font l'objet d'un traitement sécurisé sous récépissé CNDP n° D-M-588/2026."
   }
 };
 
@@ -383,182 +387,7 @@ export const INITIAL_SETTINGS: PracticeSettings = {
 // ============================================================================
 
 export const INITIAL_PATIENTS: Patient[] = [
-  // --- Cabinet Dr Yassine EL QYAMI (Agadir - Pédiatrie) ---
-  {
-    id: 'pat-agadir-1',
-    organizationId: 'org-elqyami',
-    nom: 'EL AMRI',
-    prenom: 'Rayan',
-    sexe: 'M',
-    dateNaissance: '2021-04-12',
-    age: 5,
-    telephone: '+212 6 61 98 22 10',
-    email: 'parents.elamri@gmail.com',
-    adresse: 'Résidence Islane, Bâtiment C, Apt 14, Hay Mohammadi',
-    ville: 'Agadir',
-    codePostal: '80000',
-    cin: 'Enfant (Tuteur: JC489201)',
-    numeroAmo: '10984920491',
-    organismeAssurance: 'AMO CNSS',
-    numAffiliationMutuelle: 'MUT-SAHAM-84920',
-    groupeSanguin: 'O+',
-    medecinTraitant: true,
-    statut: 'Chronique',
-    derniereConsultation: '2026-08-25',
-    prochainRdv: '2026-09-15',
-    allergies: ['Protéines de lait de vache (PLV - résolu)', 'Acariens'],
-    antecedents: {
-      medicaux: ['Asthme du nourrisson à l’âge de 18 mois', 'Bronchiolites récidivantes'],
-      chirurgicaux: ['Adénoïdectomie en 2024'],
-      familiaux: ['Père asthmatique', 'Mère rhinite allergique']
-    },
-    traitementsActuels: ['Flixotide 50µg 1 bouffée matin et soir (chambre d’inhalation)', 'Ventoline 100µg si sifflement'],
-    ald: true,
-    nomAld: 'ALD 14 - Asthme sévère de l’enfant',
-    notesGenerales: 'Enfant coopératif. Carnet vaccinal à jour (Hexavalent, Pneumocoque, ROR faits).',
-    notesConfidentiellesMedecin: 'Terrain atopique familial marqué. Surveillance spirométrie pédiatrique prévue en automne.',
-    estDossierSensible: false,
-    poidsRef: 18.5,
-    tailleRef: 110,
-    taRef: '95/60',
-    contactUrgence: {
-      nom: 'Mme Meryem El Amri (Mère)',
-      lien: 'Mère',
-      telephone: '+212 6 61 98 22 10'
-    },
-    consentementLoi0908: true,
-    createdAt: '2026-01-10',
-    updatedAt: '2026-08-25'
-  },
-  {
-    id: 'pat-agadir-2',
-    organizationId: 'org-elqyami',
-    nom: 'TAZI',
-    prenom: 'Inès',
-    sexe: 'F',
-    dateNaissance: '2024-11-05',
-    age: 1,
-    telephone: '+212 6 63 45 78 90',
-    email: 'famille.tazi.agadir@gmail.com',
-    adresse: 'Boulevard du 20 Août, Résidence Al Manzah, Apt 6',
-    ville: 'Agadir',
-    codePostal: '80000',
-    cin: 'Nourrisson (Tuteur: JB938201)',
-    numeroAmo: '20394819203',
-    organismeAssurance: 'AMO CNOPS',
-    numAffiliationMutuelle: 'MUT-MGPAP-99201',
-    groupeSanguin: 'A+',
-    medecinTraitant: true,
-    statut: 'Actif',
-    derniereConsultation: '2026-08-20',
-    prochainRdv: '2026-08-25',
-    allergies: ['Aucune allergie connue'],
-    antecedents: {
-      medicaux: ['Nouveau-né à terme (38 SA, PN 3.200 kg), APGAR 10/10', 'Ictère néonatal physiologique'],
-      chirurgicaux: ['Aucun'],
-      familiaux: ['Pas d’antécédents pathologiques']
-    },
-    traitementsActuels: ['Vitamine D3 (ZymaD 4 gouttes/jour)', 'Stérimar Bébé hygiène nasale'],
-    ald: false,
-    notesGenerales: 'Visite systématique du 9ème mois avec rappel vaccinal ROR & Méningocoque B.',
-    notesConfidentiellesMedecin: 'Bonne prise pondérale (+350g ce mois). Acquisition station assise sans appui OK.',
-    estDossierSensible: false,
-    poidsRef: 8.9,
-    tailleRef: 72,
-    contactUrgence: {
-      nom: 'M. Karim Tazi (Père)',
-      lien: 'Père',
-      telephone: '+212 6 63 45 78 90'
-    },
-    consentementLoi0908: true,
-    createdAt: '2026-02-14',
-    updatedAt: '2026-08-20'
-  },
-  {
-    id: 'pat-agadir-3',
-    organizationId: 'org-elqyami',
-    nom: 'BOUSSAID',
-    prenom: 'Adam',
-    sexe: 'M',
-    dateNaissance: '2018-09-18',
-    age: 7,
-    telephone: '+212 6 70 12 34 56',
-    email: 'boussaid.family@yahoo.fr',
-    adresse: 'Quartier Dakhla, Rue 2 Mars, Villa 88',
-    ville: 'Agadir',
-    codePostal: '80000',
-    cin: 'Enfant (Tuteur: JH102938)',
-    numeroAmo: '19482910394',
-    organismeAssurance: 'AMO CNSS',
-    numAffiliationMutuelle: 'MUT-WAFA-10928',
-    groupeSanguin: 'B+',
-    medecinTraitant: true,
-    statut: 'Actif',
-    derniereConsultation: '2026-08-25',
-    prochainRdv: '2026-09-02',
-    allergies: ['Pénicilline (Éruption cutanée à 2 ans)'],
-    antecedents: {
-      medicaux: ['Épisodes d’otites moyennes aiguës bilatérales récidivantes'],
-      chirurgicaux: ['Pose d’aérateurs transtympaniques (yoyos) en 2023'],
-      familiaux: ['Terrain de surdité familiale maternelle']
-    },
-    traitementsActuels: ['Aucun en cours'],
-    ald: false,
-    notesGenerales: 'Contrôle oto-rhino pédiatrique et certificat médical de rentrée scolaire.',
-    notesConfidentiellesMedecin: 'Tympans intègres, pas de rétraction ni épanchement rétrotympanique.',
-    estDossierSensible: false,
-    poidsRef: 24.0,
-    tailleRef: 124,
-    contactUrgence: {
-      nom: 'Mme Samira Boussaid (Mère)',
-      lien: 'Mère',
-      telephone: '+212 6 70 12 34 56'
-    },
-    consentementLoi0908: true,
-    createdAt: '2026-03-01',
-    updatedAt: '2026-08-25'
-  },
-  {
-    id: 'pat-agadir-4',
-    organizationId: 'org-elqyami',
-    nom: 'BENSAID',
-    prenom: 'Lina',
-    sexe: 'F',
-    dateNaissance: '2023-06-30',
-    age: 3,
-    telephone: '+212 6 62 89 01 23',
-    email: 'bensaid.agadir@gmail.com',
-    adresse: 'Sonaba Founty, Résidence Les Palmiers, Apt 10',
-    ville: 'Agadir',
-    codePostal: '80000',
-    cin: 'Enfant (Tuteur: JC559201)',
-    numeroAmo: '30492810294',
-    organismeAssurance: 'AMO Tadamon',
-    numAffiliationMutuelle: '',
-    groupeSanguin: 'O-',
-    medecinTraitant: true,
-    statut: 'Nouveau',
-    derniereConsultation: '2026-08-25',
-    allergies: ['Aucune allergie signalée'],
-    antecedents: {
-      medicaux: ['Gastro-entérite aiguë à 1 an'],
-      chirurgicaux: ['Aucun'],
-      familiaux: ['Diabète type 1 grand-mère']
-    },
-    traitementsActuels: ['Doliprane sirop 2.4% si fièvre > 38.5°C'],
-    ald: false,
-    notesGenerales: 'Fièvre isolée à 38.8°C depuis 24h avec toux sèche quinteuse.',
-    poidsRef: 14.2,
-    tailleRef: 96,
-    contactUrgence: {
-      nom: 'M. Omar Bensaid (Père)',
-      lien: 'Père',
-      telephone: '+212 6 62 89 01 23'
-    },
-    consentementLoi0908: true,
-    createdAt: '2026-08-25',
-    updatedAt: '2026-08-25'
-  },
+  // --- Cabinet Dr Yassine EL QYAMI (Agadir - Pédiatrie) : Espace Vierge pour démarrer l'activité réelle ---
 
   // --- Cabinet Dr Karim Bennani (Casablanca - Médecine Générale / Diabétologie) ---
   {
@@ -658,75 +487,7 @@ export const INITIAL_PATIENTS: Patient[] = [
 // ============================================================================
 
 export const INITIAL_CONSULTATIONS: Consultation[] = [
-  // --- Consultations Cabinet Agadir (Dr Yassine EL QYAMI) ---
-  {
-    id: 'cons-agadir-1',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Rayan EL AMRI',
-    date: '2026-08-25',
-    heure: '09:00',
-    dureeMinutes: 25,
-    type: 'Présentiel',
-    motif: 'Contrôle trimestriel asthme pédiatrique & renouvellement ordonnance de fond',
-    constantes: {
-      tensionSystolique: 95,
-      tensionDiastolique: 60,
-      temperature: 36.9,
-      poids: 18.5,
-      taille: 110,
-      imc: 15.3,
-      frequenceCardiaque: 88,
-      saturationO2: 99
-    },
-    symptomes: ['Aucune crise nocturne depuis 2 mois', 'Excellente tolérance aux activités sportives scolaires'],
-    examenClinique: 'Enfant eupnéique au repos. Murmure vésiculaire symétrique sans râle sibilant. Oropharynx non inflammatoire. Tympans normaux. Courbe de croissance pondérale régulière.',
-    diagnostic: 'Asthme pédiatrique bien contrôlé sous corticothérapie inhalée à dose minimale',
-    codeCim10: 'J45.0 - Asthme allergique de l’enfant',
-    traitement: 'Poursuite Flixotide 50µg (1 bouffée matin et soir) + renouvellement chambre d’inhalation',
-    notesMedicales: 'Très bonne observance parentale. Feuille de soins AMO CNSS délivrée avec prise en charge ALD 100%.',
-    notesPriveesMedecin: 'Proposer test de baisse de palier au printemps 2027 si stabilité continue.',
-    tarif: 250,
-    reglementStatut: 'Payé',
-    modePaiement: 'Carte Bancaire',
-    ordonnanceId: 'ord-agadir-1',
-    certificatId: 'cert-agadir-1',
-    createdAt: '2026-08-25 09:30:00'
-  },
-  {
-    id: 'cons-agadir-2',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-3',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Adam BOUSSAID',
-    date: '2026-08-25',
-    heure: '10:00',
-    dureeMinutes: 20,
-    type: 'Présentiel',
-    motif: 'Examen médical complet de rentrée scolaire & certificat d’aptitude aux activités sportives',
-    constantes: {
-      tensionSystolique: 100,
-      tensionDiastolique: 65,
-      temperature: 37.0,
-      poids: 24.0,
-      taille: 124,
-      imc: 15.6,
-      frequenceCardiaque: 82,
-      saturationO2: 99
-    },
-    symptomes: ['Aucune plainte fonctionnelle', 'Bonne audition signalée par les parents'],
-    examenClinique: 'Examen cardio-pulmonaire normal. Otoscopie : membranes tympaniques cicatricielles sans perforation. Acuité visuelle 10/10 aux deux yeux. Développement psychomoteur parfait.',
-    diagnostic: 'Enfant en excellente santé générale. Absence de contre-indication au sport scolaire et natation.',
-    codeCim10: 'Z00.1 - Examen de santé de routine de l’enfant',
-    traitement: 'Hygiène de vie, alimentation variée, conseils d’hydratation',
-    notesMedicales: 'Certificat médical d’aptitude sportive délivré (Football et Natation).',
-    tarif: 250,
-    reglementStatut: 'Payé',
-    modePaiement: 'Espèces',
-    certificatId: 'cert-agadir-2',
-    createdAt: '2026-08-25 10:25:00'
-  },
+  // --- Consultations Cabinet Agadir (Dr Yassine EL QYAMI) : Vierge ---
 
   // --- Consultations Cabinet Casablanca (Dr Karim Bennani) ---
   {
@@ -769,46 +530,9 @@ export const INITIAL_CONSULTATIONS: Consultation[] = [
 // ============================================================================
 
 export const INITIAL_PRESCRIPTIONS: Prescription[] = [
-  {
-    id: 'ord-agadir-1',
-    organizationId: 'org-elqyami',
-    consultationId: 'cons-agadir-1',
-    patientId: 'pat-agadir-1',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Rayan EL AMRI',
-    date: '2026-08-25',
-    aldConcernee: true,
-    medicaments: [
-      {
-        id: 'med-1',
-        medicament: 'FLIXOTIDE 50 µg / dose',
-        dci: 'Propionate de fluticasone',
-        dosage: '50 µg',
-        forme: 'Suspension pour inhalation buccale',
-        posologie: '1 bouffée le matin et 1 bouffée le soir avec chambre d’inhalation (AeroChamber)',
-        frequence: 'Matin et Soir',
-        duree: '3 mois (Traitement de fond)',
-        instructions: 'Bien rincer la bouche à l’eau après chaque prise.',
-        ald: true,
-        nonSubstituable: true
-      },
-      {
-        id: 'med-2',
-        medicament: 'VENTOLINE 100 µg / dose',
-        dci: 'Salbutamol',
-        dosage: '100 µg',
-        forme: 'Aérosol-doseur',
-        posologie: '1 à 2 bouffées en cas de toux quinteuse ou sifflement respiratoire',
-        frequence: 'Si besoin',
-        duree: 'En cas de crise',
-        instructions: 'À administrer immédiatement avec la chambre d’inhalation.',
-        ald: true,
-        nonSubstituable: false
-      }
-    ],
-    conseilsHygiene: 'Aérer la chambre 15 minutes chaque matin. Éviter l’exposition aux fumées de tabac et aux parfums d’ambiance.',
-    createdAt: '2026-08-25 09:30:00'
-  },
+  // --- Cabinet Agadir : Vierge ---
+
+  // --- Cabinet Casablanca (Dr Karim Bennani) ---
   {
     id: 'ord-casa-1',
     organizationId: 'org-bennani',
@@ -842,19 +566,7 @@ export const INITIAL_PRESCRIPTIONS: Prescription[] = [
 // ============================================================================
 
 export const INITIAL_CERTIFICATES: MedicalCertificate[] = [
-  {
-    id: 'cert-agadir-1',
-    organizationId: 'org-elqyami',
-    type: 'aptitude_sport',
-    titre: 'Certificat Médical d’Aptitude Sportive Scolaire',
-    patientId: 'pat-agadir-3',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Adam BOUSSAID',
-    date: '2026-08-25',
-    sportPratique: 'Éducation physique scolaire, Football & Natation',
-    texteContenu: "Je soussigné, Dr Yassine EL QYAMI, Docteur en Médecine, spécialiste en Pédiatrie à Agadir, certifie avoir examiné ce jour l'enfant Adam BOUSSAID, né le 18/09/2018, et atteste qu'il ne présente à ce jour aucun signe clinique décelable contre-indiquant la pratique des activités physiques et sportives scolaires (Football, Gymnastique, Natation).\n\nCertificat délivré aux représentants légaux pour servir et valoir ce que de droit.",
-    createdAt: '2026-08-25 10:25:00'
-  }
+  // --- Cabinet Agadir : Vierge ---
 ];
 
 // ============================================================================
@@ -862,59 +574,7 @@ export const INITIAL_CERTIFICATES: MedicalCertificate[] = [
 // ============================================================================
 
 export const INITIAL_APPOINTMENTS: Appointment[] = [
-  // --- Cabinet Agadir (Dr Yassine EL QYAMI) ---
-  {
-    id: 'rdv-agadir-1',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Rayan EL AMRI',
-    date: '2026-08-25',
-    heureDebut: '09:00',
-    heureFin: '09:30',
-    motif: 'Contrôle asthme & ordonnance de fond',
-    type: 'Consultation',
-    statut: 'Terminé'
-  },
-  {
-    id: 'rdv-agadir-2',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-3',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Adam BOUSSAID',
-    date: '2026-08-25',
-    heureDebut: '10:00',
-    heureFin: '10:30',
-    motif: 'Certificat médical de rentrée sportive',
-    type: 'Consultation',
-    statut: 'Terminé'
-  },
-  {
-    id: 'rdv-agadir-3',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-2',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Inès TAZI',
-    date: '2026-08-25',
-    heureDebut: '11:00',
-    heureFin: '11:30',
-    motif: 'Visite systématique du 9ème mois & Vaccin',
-    type: 'Vaccination',
-    statut: 'En cours'
-  },
-  {
-    id: 'rdv-agadir-4',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-4',
-    doctorId: 'usr-elqyami-owner',
-    patientNomComplet: 'Lina BENSAID',
-    date: '2026-08-25',
-    heureDebut: '11:45',
-    heureFin: '12:15',
-    motif: 'Fièvre aiguë à 38.8°C et toux sèche',
-    type: 'Urgence',
-    statut: 'En attente'
-  },
+  // --- Cabinet Agadir (Dr Yassine EL QYAMI) : Vierge ---
 
   // --- Cabinet Casablanca (Dr Karim Bennani) ---
   {
@@ -950,33 +610,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
 // ============================================================================
 
 export const INITIAL_WAITING_ROOM: WaitingPatient[] = [
-  // --- Salle d'attente Cabinet Agadir ---
-  {
-    id: 'wait-agadir-1',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-2',
-    nomComplet: 'Inès TAZI (1 an)',
-    age: 1,
-    heureArrivee: '10:50',
-    tempsAttenteMinutes: 15,
-    motif: 'Vaccin du 9ème mois & Pesée',
-    avecRdv: true,
-    statut: 'En consultation',
-    urgence: false
-  },
-  {
-    id: 'wait-agadir-2',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-4',
-    nomComplet: 'Lina BENSAID (3 ans)',
-    age: 3,
-    heureArrivee: '11:05',
-    tempsAttenteMinutes: 10,
-    motif: 'Fièvre aiguë 38.8°C & toux',
-    avecRdv: false,
-    statut: 'En attente',
-    urgence: true
-  },
+  // --- Salle d'attente Cabinet Agadir : Vierge ---
 
   // --- Salle d'attente Cabinet Casablanca ---
   {
@@ -999,63 +633,9 @@ export const INITIAL_WAITING_ROOM: WaitingPatient[] = [
 // ============================================================================
 
 export const INITIAL_DOCUMENTS: MedicalDocument[] = [
-  {
-    id: 'doc-agadir-1',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    patientNomComplet: 'Rayan EL AMRI',
-    nom: 'Exploration Fonctionnelle Respiratoire (EFR Pédiatrique) - Clinique Agadir.pdf',
-    categorie: 'Analyses',
-    date: '2026-05-18',
-    taille: '1.4 Mo',
-    auteur: 'Dr Yassine EL QYAMI',
-    uploadedByUserId: 'usr-elqyami-owner',
-    typeMime: 'application/pdf',
-    apercuContenu: 'VEMS/CVF = 84%. Absence de syndrome obstructif significatif.',
-    isPrivateVault: true,
-    vaultStoragePath: 'vault/org-elqyami/patients/pat-agadir-1/efr-2026-05.pdf.enc',
-    encryptionAlgorithm: 'AES-256-GCM',
-    checksumSha256: '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
-    signedUrlExpiresInMinutes: 15
-  },
-  {
-    id: 'doc-agadir-2',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    patientNomComplet: 'Rayan EL AMRI',
-    nom: 'Ordonnance Sécurisée du 25/08/2026 (Flixotide & Ventoline).pdf',
-    categorie: 'Ordonnances',
-    date: '2026-08-25',
-    taille: '120 Ko',
-    auteur: 'Dr Yassine EL QYAMI',
-    uploadedByUserId: 'usr-elqyami-owner',
-    typeMime: 'application/pdf',
-    apercuContenu: 'Flixotide 50µg + Ventoline 100µg + Chambre AeroChamber',
-    isPrivateVault: true,
-    vaultStoragePath: 'vault/org-elqyami/patients/pat-agadir-1/ord-2026-08-25.pdf.enc',
-    encryptionAlgorithm: 'AES-256-GCM',
-    checksumSha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    signedUrlExpiresInMinutes: 15
-  },
-  {
-    id: 'doc-agadir-3',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-3',
-    patientNomComplet: 'Adam BOUSSAID',
-    nom: 'Certificat Aptitude Sportive Scolaire 2026-2027.pdf',
-    categorie: 'Certificats',
-    date: '2026-08-25',
-    taille: '95 Ko',
-    auteur: 'Dr Yassine EL QYAMI',
-    uploadedByUserId: 'usr-elqyami-owner',
-    typeMime: 'application/pdf',
-    apercuContenu: 'Aptitude Football & Natation',
-    isPrivateVault: true,
-    vaultStoragePath: 'vault/org-elqyami/patients/pat-agadir-3/cert-sport-2026.pdf.enc',
-    encryptionAlgorithm: 'AES-256-GCM',
-    checksumSha256: '5d41402abc4b2a76b9719d911017c592',
-    signedUrlExpiresInMinutes: 15
-  },
+  // --- Cabinet Agadir : Vierge ---
+
+  // --- Cabinet Casablanca ---
   {
     id: 'doc-casa-1',
     organizationId: 'org-bennani',
@@ -1167,40 +747,7 @@ export const INITIAL_MEDICATIONS: Medication[] = [
 // ============================================================================
 
 export const INITIAL_TRANSACTIONS: PaymentTransaction[] = [
-  // --- Transactions Cabinet Agadir ---
-  {
-    id: 'tx-agadir-1',
-    organizationId: 'org-elqyami',
-    date: '2026-08-25',
-    patientId: 'pat-agadir-1',
-    patientNomComplet: 'Rayan EL AMRI',
-    montant: 250,
-    typeActe: 'Consultation Pédiatrique & Suivi ALD',
-    modePaiement: 'Carte Bancaire',
-    statut: 'Payé'
-  },
-  {
-    id: 'tx-agadir-2',
-    organizationId: 'org-elqyami',
-    date: '2026-08-25',
-    patientId: 'pat-agadir-3',
-    patientNomComplet: 'Adam BOUSSAID',
-    montant: 250,
-    typeActe: 'Consultation & Certificat Médical Sportif',
-    modePaiement: 'Espèces',
-    statut: 'Payé'
-  },
-  {
-    id: 'tx-agadir-3',
-    organizationId: 'org-elqyami',
-    date: '2026-08-24',
-    patientId: 'pat-agadir-2',
-    patientNomComplet: 'Inès TAZI',
-    montant: 250,
-    typeActe: 'Visite Nourrisson & Courbes OMS',
-    modePaiement: 'Carte Bancaire',
-    statut: 'Payé'
-  },
+  // --- Transactions Cabinet Agadir : Vierge ---
 
   // --- Transactions Cabinet Casablanca ---
   {
@@ -1228,37 +775,7 @@ export const INITIAL_TRANSACTIONS: PaymentTransaction[] = [
 ];
 
 export const INITIAL_EXPENSES: ExpenseItem[] = [
-  // --- Dépenses Cabinet Agadir ---
-  {
-    id: 'exp-agadir-1',
-    organizationId: 'org-elqyami',
-    date: '2026-08-01',
-    fournisseur: 'SCI Résidence Al Manar Agadir',
-    description: 'Loyer mensuel du cabinet médical (Août 2026)',
-    categorie: 'Loyer & Charges',
-    montant: 6500,
-    statut: 'Réglé'
-  },
-  {
-    id: 'exp-agadir-2',
-    organizationId: 'org-elqyami',
-    date: '2026-08-05',
-    fournisseur: 'Médical Souss Distribution',
-    description: 'Draps d’examen pédiatriques, abaisse-langues et thermomètres',
-    categorie: 'Consommables',
-    montant: 1250,
-    statut: 'Réglé'
-  },
-  {
-    id: 'exp-agadir-3',
-    organizationId: 'org-elqyami',
-    date: '2026-01-01',
-    fournisseur: 'Wolf Digital SARL',
-    description: 'Abonnement Annuel SaaS MEDICAL OS Standard (3 000 MAD / an)',
-    categorie: 'Logiciels & Informatique',
-    montant: 3000,
-    statut: 'Réglé'
-  },
+  // --- Dépenses Cabinet Agadir : Vierge ---
 
   // --- Dépenses Cabinet Casablanca ---
   {
@@ -1289,49 +806,6 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
 
 export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   {
-    id: 'log-agadir-1',
-    organizationId: 'org-elqyami',
-    timestamp: '2026-08-25 09:30:00',
-    userId: 'usr-elqyami-owner',
-    userName: 'Dr Yassine EL QYAMI',
-    userRole: 'Médecin Titulaire',
-    actionType: 'PRESCRIPTION_MEDICAMENTEUSE',
-    categorie: 'Prescription',
-    patientId: 'pat-agadir-1',
-    patientName: 'Rayan EL AMRI',
-    ipAddress: '196.200.180.12 (Cabinet Agadir Sécurisé)',
-    details: 'Émission ordonnance sécurisée pédiatrique (Flixotide 50µg + Ventoline 100µg)',
-    hashIntegrite: '8f92b4920c81a920b78491829103948192039481029384910293849102938491'
-  },
-  {
-    id: 'log-agadir-2',
-    organizationId: 'org-elqyami',
-    timestamp: '2026-08-25 09:00:15',
-    userId: 'usr-elqyami-owner',
-    userName: 'Dr Yassine EL QYAMI',
-    userRole: 'Médecin Titulaire',
-    actionType: 'LECTURE_DOSSIER',
-    categorie: 'Dossier Patient',
-    patientId: 'pat-agadir-1',
-    patientName: 'Rayan EL AMRI',
-    ipAddress: '196.200.180.12',
-    details: 'Consultation du dossier pédiatrique et carnet vaccinal',
-    hashIntegrite: '3f79bb7b435b05321651daefd374cd681b61b47b2c9e7a71f0ffc06a4b1f6211'
-  },
-  {
-    id: 'log-agadir-3',
-    organizationId: 'org-elqyami',
-    timestamp: '2026-08-25 08:30:00',
-    userId: 'usr-elqyami-sec',
-    userName: 'Soukaina CHAMI',
-    userRole: 'Secrétaire Médicale',
-    actionType: 'CONNEXION_UTILISATEUR',
-    categorie: 'Sécurité & Accès',
-    ipAddress: '196.200.180.14 (Poste Secrétariat Agadir)',
-    details: 'Authentification réussie 2FA SMS au poste d’accueil du cabinet',
-    hashIntegrite: 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb'
-  },
-  {
     id: 'log-casa-1',
     organizationId: 'org-bennani',
     timestamp: '2026-08-25 09:42:15',
@@ -1353,35 +827,6 @@ export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
 // ============================================================================
 
 export const INITIAL_PATIENT_CONSENTS: PatientConsent[] = [
-  {
-    id: 'cst-agadir-1',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    patientNom: 'Rayan EL AMRI',
-    cin: 'Tuteur: JC489201',
-    typeConsentement: 'traitement_donnees_sante',
-    libelle: 'Traitement sécurisé des données pédiatriques sous encadrement Loi 09-08',
-    baseLegale: 'Articles 4 & 12 de la Loi 09-08',
-    dateConsentement: '2026-01-10',
-    statut: 'Accordé',
-    methodeRecueil: 'Signature électronique sur tablette',
-    recueilliPar: 'Dr Yassine EL QYAMI',
-    notes: 'Consentement signé par Mme Meryem El Amri (Mère et représentante légale).'
-  },
-  {
-    id: 'cst-agadir-2',
-    organizationId: 'org-elqyami',
-    patientId: 'pat-agadir-1',
-    patientNom: 'Rayan EL AMRI',
-    cin: 'Tuteur: JC489201',
-    typeConsentement: 'rappels_sms_whatsapp',
-    libelle: 'Rappels de rendez-vous vaccinaux et alertes médicales par SMS',
-    baseLegale: 'Article 4 de la Loi 09-08',
-    dateConsentement: '2026-01-10',
-    statut: 'Accordé',
-    methodeRecueil: 'Signature électronique sur tablette',
-    recueilliPar: 'Soukaina CHAMI'
-  },
   {
     id: 'cst-casa-1',
     organizationId: 'org-bennani',
