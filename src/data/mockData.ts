@@ -18,7 +18,8 @@ import {
   RetentionPolicy,
   DataExportJob,
   SupportTicket,
-  WolfDigitalMetric
+  WolfDigitalMetric,
+  DentalQuote
 } from '../types';
 
 // ============================================================================
@@ -100,6 +101,56 @@ export const ORGANIZATIONS: Organization[] = [
     lastBackupDate: '2026-08-25 04:00:00',
     cndpDeclaration: 'En cours de déclaration',
     isDemoTenant: true
+  },
+  {
+    id: 'org-dentaire-alami',
+    name: 'Cabinet Dentaire & Implantologie — Dr. Sara ALAMI',
+    slug: 'cabinet-dentaire-dr-sara-alami-casablanca',
+    speciality: 'Chirurgie Dentaire, Implantologie, Odontologie & Orthodontie',
+    city: 'Casablanca',
+    address: "Boulevard d'Anfa, Espace Dentaire Casablanca, 2ème étage",
+    phone: '+212 5 22 25 30 40',
+    email: 'dr.sara.dentiste@gmail.com',
+    ice: '003829104000088',
+    inpe: '7029182390',
+    cnom: 'D-8492',
+    plan: 'MEDICAL_OS_STANDARD',
+    priceMadPerYear: 3000,
+    subscriptionStatus: 'active',
+    subscriptionStart: '2026-01-10',
+    subscriptionEnd: '2026-12-31',
+    isAutoRenew: true,
+    storageUsedMb: 390,
+    storageMaxMb: 5000,
+    backupStatus: 'healthy',
+    lastBackupDate: '2026-08-25 04:00:00 (Géo-redondant chiffré AES-256)',
+    cndpDeclaration: 'D-M-742/2026',
+    isDemoTenant: false
+  },
+  {
+    id: 'org-elkettani',
+    name: 'Cabinet Médical & Cardiologie — Dr. Mehdi EL KETTANI',
+    slug: 'dr-elkettani',
+    speciality: 'Cardiologie, Échographie Cardiaque & Médecine Interne',
+    city: 'Casablanca',
+    address: "124 Boulevard d'Anfa, Espace Médical Anfa, 3ème étage, Casablanca",
+    phone: '+212 5 22 45 67 89',
+    email: 'dr.elkettani@gmail.com',
+    ice: '003847291000055',
+    inpe: '9028374820',
+    cnom: '21490',
+    plan: 'MEDICAL_OS_STANDARD',
+    priceMadPerYear: 3000,
+    subscriptionStatus: 'active',
+    subscriptionStart: '2026-01-15',
+    subscriptionEnd: '2026-12-31',
+    isAutoRenew: true,
+    storageUsedMb: 310,
+    storageMaxMb: 5000,
+    backupStatus: 'healthy',
+    lastBackupDate: '2026-08-25 04:00:00 (Géo-redondant chiffré AES-256)',
+    cndpDeclaration: 'D-M-612/2026',
+    isDemoTenant: false
   }
 ];
 
@@ -108,6 +159,70 @@ export const ORGANIZATIONS: Organization[] = [
 // ============================================================================
 
 export const INITIAL_USER_ACCOUNTS: UserAccount[] = [
+  {
+    id: 'usr-alami-owner',
+    organizationId: 'org-dentaire-alami',
+    role: 'DOCTOR_OWNER',
+    roleLabel: 'Chirurgien-Dentiste & Implantologue Titulaire',
+    name: 'Dr. Sara ALAMI',
+    email: 'dr.sara.dentiste@gmail.com',
+    username: 'dr.sara',
+    password: 'Sara@Dentiste2026',
+    phone: '+212 6 61 33 44 55',
+    status: 'active',
+    mfaEnabled: true,
+    createdAt: '2026-01-10',
+    lastLogin: '2026-08-25 09:30:00',
+    permissions: {
+      canViewMedicalRecords: true,
+      canEditMedicalRecords: true,
+      canViewSensitiveDiagnoses: true,
+      canViewPrivateDoctorNotes: true,
+      canPrescribe: true,
+      canGenerateCertificates: true,
+      canManageAppointments: true,
+      canManageWaitingRoom: true,
+      canManagePayments: true,
+      canViewFinancials: true,
+      canExportData: true,
+      canDeleteRecords: true,
+      canManageUsers: true,
+      canViewAuditLogs: true,
+      canAccessTechnicalAdmin: false
+    }
+  },
+  {
+    id: 'usr-alami-sec',
+    organizationId: 'org-dentaire-alami',
+    role: 'SECRETARY',
+    roleLabel: 'Secrétaire & Assistante Dentaire',
+    name: 'Meryem KABBAJ (Secrétariat Dentaire)',
+    email: 'secretariat.dentaire@cabinet-alami.ma',
+    username: 'sec.dentaire',
+    password: 'SecretariatDentaire2026!',
+    phone: '+212 6 62 11 22 33',
+    status: 'active',
+    mfaEnabled: true,
+    createdAt: '2026-01-12',
+    lastLogin: '2026-08-25 08:35:00',
+    permissions: {
+      canViewMedicalRecords: false,
+      canEditMedicalRecords: false,
+      canViewSensitiveDiagnoses: false,
+      canViewPrivateDoctorNotes: false,
+      canPrescribe: false,
+      canGenerateCertificates: false,
+      canManageAppointments: true,
+      canManageWaitingRoom: true,
+      canManagePayments: true,
+      canViewFinancials: true,
+      canExportData: false,
+      canDeleteRecords: false,
+      canManageUsers: false,
+      canViewAuditLogs: false,
+      canAccessTechnicalAdmin: false
+    }
+  },
   {
     id: 'usr-elqyami-owner',
     organizationId: 'org-elqyami',
@@ -231,6 +346,70 @@ export const INITIAL_USER_ACCOUNTS: UserAccount[] = [
       canViewAuditLogs: false,
       canAccessTechnicalAdmin: true // ONLY TECHNICAL & SUBSCRIPTION METRICS
     }
+  },
+  {
+    id: 'usr-elkettani-owner',
+    organizationId: 'org-elkettani',
+    role: 'DOCTOR_OWNER',
+    roleLabel: 'Médecin Cardiologue Titulaire',
+    name: 'Dr. Mehdi EL KETTANI',
+    email: 'dr.elkettani@gmail.com',
+    username: 'dr.elkettani',
+    password: 'ElKettani@Medical2026',
+    phone: '+212 6 61 55 66 77',
+    status: 'active',
+    mfaEnabled: true,
+    createdAt: '2026-01-15',
+    lastLogin: '2026-08-25 10:15:00',
+    permissions: {
+      canViewMedicalRecords: true,
+      canEditMedicalRecords: true,
+      canViewSensitiveDiagnoses: true,
+      canViewPrivateDoctorNotes: true,
+      canPrescribe: true,
+      canGenerateCertificates: true,
+      canManageAppointments: true,
+      canManageWaitingRoom: true,
+      canManagePayments: true,
+      canViewFinancials: true,
+      canExportData: true,
+      canDeleteRecords: true,
+      canManageUsers: true,
+      canViewAuditLogs: true,
+      canAccessTechnicalAdmin: false
+    }
+  },
+  {
+    id: 'usr-elkettani-sec',
+    organizationId: 'org-elkettani',
+    role: 'SECRETARY',
+    roleLabel: 'Secrétaire Médicale (Accueil & Prise de RDV)',
+    name: 'Hajar TAHIRI (Secrétariat)',
+    email: 'secretariat.elkettani@gmail.com',
+    username: 'sec.elkettani',
+    password: 'SecKettani2026!',
+    phone: '+212 6 63 44 55 66',
+    status: 'active',
+    mfaEnabled: true,
+    createdAt: '2026-01-18',
+    lastLogin: '2026-08-25 08:45:00',
+    permissions: {
+      canViewMedicalRecords: false,
+      canEditMedicalRecords: false,
+      canViewSensitiveDiagnoses: false,
+      canViewPrivateDoctorNotes: false,
+      canPrescribe: false,
+      canGenerateCertificates: false,
+      canManageAppointments: true,
+      canManageWaitingRoom: true,
+      canManagePayments: true,
+      canViewFinancials: true,
+      canExportData: false,
+      canDeleteRecords: false,
+      canManageUsers: false,
+      canViewAuditLogs: false,
+      canAccessTechnicalAdmin: false
+    }
   }
 ];
 
@@ -306,6 +485,145 @@ export const DR_EL_QYAMI_SETTINGS: PracticeSettings = {
     ],
     delaiConservationDossiers: "Conservation jusqu'à l'âge de 28 ans du patient (Dossier pédiatrique)",
     texteAfficheSalleAttente: "Conformément à la loi n° 09-08, les données médicales de votre enfant font l'objet d'un traitement sécurisé sous récépissé CNDP n° D-M-588/2026."
+  }
+};
+
+export const DR_SARA_ALAMI_SETTINGS: PracticeSettings = {
+  cabinet: {
+    nom: 'Cabinet Dentaire & Implantologie — Dr. Sara ALAMI',
+    adresse: "Boulevard d'Anfa, Espace Dentaire Casablanca, 2ème étage",
+    codePostal: '20000',
+    ville: 'Casablanca',
+    pays: 'Royaume du Maroc',
+    telephone: '+212 5 22 25 30 40',
+    email: 'dr.sara.dentiste@gmail.com',
+    ice: '003829104000088',
+    identifiantFiscal: '60392817',
+    patente: '59201934',
+    horaires: 'Lundi - Vendredi: 9h00 à 19h00 · Samedi: 9h00 à 14h00 · Urgences dentaires sur RDV'
+  },
+  medecin: {
+    civilite: 'Dr',
+    prenom: 'Sara',
+    nom: 'ALAMI',
+    specialite: 'Chirurgie Dentaire, Implantologie, Odontologie & Orthodontie',
+    numeroInpe: '7029182390',
+    numeroCnom: 'D-8492',
+    secteur: 'Chirurgie Dentaire Libérale & Conventionnée AMO',
+    signatureUrl: ''
+  },
+  tarifs: {
+    secteur: 'Secteur Dentaire Conventionné AMO & HN',
+    consultationAdulte: 200,
+    consultationEnfant: 150,
+    ecg: 0,
+    visiteDomicile: 0,
+    certificat: 100
+  },
+  documentSettings: {
+    enteteTexte: 'Cabinet de Chirurgie Dentaire & Implantologie — Dr. Sara ALAMI · Odontologie, Prothèses & Orthodontie',
+    piedDePage: 'Cabinet Dentaire Dr. Sara ALAMI · Devis & Ordonnance Bucco-Dentaire Conforme AMO & CNDP Loi 09-08',
+    afficherTampon: true,
+    afficherLogo: true
+  },
+  privacyPolicy: {
+    responsableTraitement: 'Dr. Sara ALAMI',
+    qualiteResponsable: 'Chirurgien-Dentiste Responsable du Cabinet',
+    numeroInpe: '7029182390',
+    numeroCnom: 'D-8492',
+    statutDeclarationCndp: 'Récépissé de déclaration obtenu',
+    numeroRecepisseCndp: 'D-M-742/2026',
+    dateDeclarationCndp: '2026-02-18',
+    contactDpoEmail: 'dpo@cabinet-alami-dentaire.ma',
+    contactDpoTel: '+212 5 22 25 30 40',
+    finalitesTraitement: [
+      'Dossier bucco-dentaire informatisé, odontogramme 32 dents, radiographies numériques RVG & Cone Beam CBCT',
+      'Établissement des devis dentaires détaillés, feuilles de soins et télétransmission AMO (CNSS, CNOPS) et mutuelles',
+      'Traçabilité des implants, dispositifs médicaux sur mesure et prothèses dentaires',
+      'Protection des données de santé bucco-dentaire selon la Loi 09-08'
+    ],
+    destinatairesAutorises: [
+      'Dr. Sara ALAMI (Chirurgien-Dentiste titulaire)',
+      'Assistante et secrétaire dentaire sous secret professionnel',
+      'Laboratoire de prothèse dentaire sous contrat de sous-traitance conforme CNDP',
+      'Organismes AMO (CNSS, CNOPS, Mutuelles)'
+    ],
+    droitsPatients: [
+      'Droit d’accès aux radiographies et odontogrammes (Article 7)',
+      'Droit de rectification (Article 8)',
+      'Droit d’opposition pour motifs légitimes (Article 9)',
+      'Droit de réclamation auprès de la CNDP'
+    ],
+    delaiConservationDossiers: "20 ans pour les dossiers d'implantologie et soins bucco-dentaires",
+    texteAfficheSalleAttente: "Cabinet Dentaire Dr. Sara ALAMI : Traitement informatique de vos dossiers bucco-dentaires conforme à la loi 09-08 CNDP (Récépissé D-M-742/2026)."
+  }
+};
+
+export const DR_EL_KETTANI_SETTINGS: PracticeSettings = {
+  cabinet: {
+    nom: 'Cabinet Médical & Cardiologie — Dr. Mehdi EL KETTANI',
+    adresse: "124 Boulevard d'Anfa, Espace Médical Anfa, 3ème étage",
+    codePostal: '20050',
+    ville: 'Casablanca',
+    pays: 'Royaume du Maroc',
+    telephone: '+212 5 22 45 67 89',
+    email: 'dr.elkettani@gmail.com',
+    ice: '003847291000055',
+    identifiantFiscal: '61492019',
+    patente: '50392819',
+    horaires: 'Du Lundi au Vendredi de 8h30 à 18h30 · Samedi de 9h00 à 13h00 · Urgences cardio 24/7'
+  },
+  medecin: {
+    civilite: 'Dr',
+    prenom: 'Mehdi',
+    nom: 'EL KETTANI',
+    specialite: 'Cardiologie, Échographie Cardiaque & Pathologies Vasculaires',
+    numeroInpe: '9028374820',
+    numeroCnom: '21490',
+    secteur: 'Secteur Libéral Conventionné AMO (CNSS / CNOPS)',
+    signatureUrl: ''
+  },
+  tarifs: {
+    secteur: 'Secteur 1 Conventionné AMO',
+    consultationAdulte: 300,
+    consultationEnfant: 250,
+    ecg: 200,
+    visiteDomicile: 600,
+    certificat: 150
+  },
+  documentSettings: {
+    enteteTexte: 'Dr Mehdi EL KETTANI — Spécialiste en Cardiologie & Maladies Vasculaires (Lauréat Faculté de Médecine)',
+    piedDePage: 'N° INPE : 9028374820 · N° Ordre CNOM : 21490 · ICE : 003847291000055 · Traitement conforme Loi 09-08 CNDP D-M-612/2026',
+    afficherTampon: true,
+    afficherLogo: true
+  },
+  privacyPolicy: {
+    responsableTraitement: 'Dr. Mehdi EL KETTANI',
+    qualiteResponsable: 'Médecin Spécialiste Responsable du Cabinet',
+    numeroInpe: '9028374820',
+    numeroCnom: '21490',
+    statutDeclarationCndp: 'Récépissé de déclaration obtenu',
+    numeroRecepisseCndp: 'D-M-612/2026',
+    dateDeclarationCndp: '2026-01-20',
+    contactDpoEmail: 'dpo@cabinet-kettani-cardio.ma',
+    contactDpoTel: '+212 5 22 45 67 89',
+    finalitesTraitement: [
+      'Diagnostic cardiologique, holter tensionnel, ECG et suivi vasculaire',
+      'Prescriptions médicales sécurisées et télétransmission AMO (CNSS, CNOPS)',
+      'Protection des données de santé conformément à la Loi 09-08'
+    ],
+    destinatairesAutorises: [
+      'Dr. Mehdi EL KETTANI (Médecin titulaire)',
+      'Secrétariat médical sous secret professionnel',
+      'Organismes AMO (CNSS, CNOPS, Mutuelles)'
+    ],
+    droitsPatients: [
+      'Droit d’accès aux examens et ECG (Article 7)',
+      'Droit de rectification (Article 8)',
+      'Droit d’opposition pour motifs légitimes (Article 9)'
+    ],
+    delaiConservationDossiers: '20 ans à compter de la dernière consultation',
+    texteAfficheSalleAttente: 'Cabinet Dr. Mehdi EL KETTANI : Dossiers cardiologiques protégés conformément à la loi 09-08 CNDP (Récépissé D-M-612/2026).'
   }
 };
 
@@ -387,6 +705,219 @@ export const INITIAL_SETTINGS: PracticeSettings = {
 // ============================================================================
 
 export const INITIAL_PATIENTS: Patient[] = [
+  // --- Cabinet Médical & Cardiologie Dr. Mehdi EL KETTANI (Casablanca) ---
+  {
+    id: 'pat-kettani-1',
+    organizationId: 'org-elkettani',
+    nom: 'AMRAOUI',
+    prenom: 'Youssef',
+    sexe: 'M',
+    dateNaissance: '1972-04-14',
+    age: 54,
+    telephone: '+212 6 61 22 33 44',
+    email: 'youssef.amraoui@gmail.com',
+    adresse: '78 Boulevard Ghandi, Casablanca',
+    ville: 'Casablanca',
+    codePostal: '20100',
+    cin: 'BE392810',
+    numeroAmo: '20492819039',
+    organismeAssurance: 'AMO CNSS',
+    numAffiliationMutuelle: 'MUT-SAHAM-92019',
+    groupeSanguin: 'A+',
+    medecinTraitant: true,
+    statut: 'Actif',
+    derniereConsultation: '2026-08-25',
+    prochainRdv: '2026-09-15',
+    allergies: ['Aspirine (intolérance gastrique sévère)'],
+    antecedents: {
+      medicaux: ['Hypertension artérielle essentielle stade 2 (depuis 2018)', 'Dyslipidémie mixte', 'Tabagisme sevré (15 PA)'],
+      chirurgicaux: ['Appendicectomie en 1995'],
+      familiaux: ['Père décédé IDM à 58 ans']
+    },
+    traitementsActuels: ['Amlodipine 5mg 1cp/j', 'Atorvastatine 20mg 1cp le soir', 'Co-Aprovel 300/12.5mg'],
+    ald: true,
+    nomAld: 'Affections cardiovasculaires graves (ALD 5)',
+    notesGenerales: 'Suivi régulier HTA. Échographie cardiaque normale FEVG 62%. Holter ECG satisfaisant.',
+    notesConfidentiellesMedecin: 'Patient observant. Pression artérielle stabilisée à 128/82 mmHg sous bithérapie.',
+    estDossierSensible: false,
+    poidsRef: 82,
+    tailleRef: 176,
+    taRef: '128/82',
+    contactUrgence: {
+      nom: 'Mme Latifa Amraoui (Épouse)',
+      lien: 'Épouse',
+      telephone: '+212 6 61 88 99 00'
+    }
+  },
+  {
+    id: 'pat-kettani-2',
+    organizationId: 'org-elkettani',
+    nom: 'ZAHRAOUI',
+    prenom: 'Fatima',
+    sexe: 'F',
+    dateNaissance: '1964-11-20',
+    age: 62,
+    telephone: '+212 6 63 77 11 22',
+    email: 'fatima.zahraoui@yahoo.fr',
+    adresse: '15 Rue de Tiznit, Casablanca',
+    ville: 'Casablanca',
+    codePostal: '20000',
+    cin: 'B592019',
+    numeroAmo: '10392810492',
+    organismeAssurance: 'AMO CNOPS',
+    numAffiliationMutuelle: 'MUT-CNOPS-44920',
+    groupeSanguin: 'O+',
+    medecinTraitant: true,
+    statut: 'Actif',
+    derniereConsultation: '2026-08-25',
+    prochainRdv: '2026-10-10',
+    allergies: ['Iode (allergie cutanée)'],
+    antecedents: {
+      medicaux: ['Palpitations post-effort', 'Surpoids IMC 28.4', 'Hypothyroïdie traitée'],
+      chirurgicaux: ['Cholécystectomie sous coelioscopie 2012'],
+      familiaux: ['Mère AVC ischémique à 74 ans']
+    },
+    traitementsActuels: ['Lévothyrox 75µg', 'Bisoprolol 2.5mg 1cp/matin'],
+    ald: false,
+    notesGenerales: 'Bilan cardiaque annuel. ECG rythme sinusal régulier, absence de trouble de repolarisation.',
+    notesConfidentiellesMedecin: 'Épreuve d effort négative pour l ischémie à 85% de la FMT.',
+    estDossierSensible: false,
+    poidsRef: 69,
+    tailleRef: 162,
+    taRef: '120/75',
+    contactUrgence: {
+      nom: 'M. Karim Zahraoui (Fils)',
+      lien: 'Fils',
+      telephone: '+212 6 64 33 22 11'
+    }
+  },
+  // --- Cabinet Dentaire Dr. Sara ALAMI (Casablanca - Chirurgie Dentaire & Implantologie) ---
+  {
+    id: 'pat-dent-1',
+    organizationId: 'org-dentaire-alami',
+    nom: 'TAZI',
+    prenom: 'Othmane',
+    sexe: 'M',
+    dateNaissance: '1992-05-18',
+    age: 34,
+    telephone: '+212 6 61 77 88 99',
+    email: 'othmane.tazi@gmail.com',
+    adresse: '24 Boulevard Zerktouni, Résidence Les Jardins, Casablanca',
+    ville: 'Casablanca',
+    codePostal: '20050',
+    cin: 'BK542890',
+    numeroAmo: '10984920194',
+    organismeAssurance: 'AMO CNSS',
+    numAffiliationMutuelle: 'MUT-WAFA-84291',
+    groupeSanguin: 'O+',
+    medecinTraitant: false,
+    statut: 'Actif',
+    derniereConsultation: '2026-08-20',
+    prochainRdv: '2026-09-02',
+    allergies: ['Pénicilline'],
+    antecedents: {
+      medicaux: ['Asthme léger à l\'effort'],
+      chirurgicaux: ['Avulsion 26 suite à fracture radiculaire en 2024'],
+      familiaux: ['Père diabétique']
+    },
+    traitementsActuels: ['Ventoline si crise d\'asthme'],
+    ald: false,
+    notesGenerales: 'Plan de réhabilitation implantaire en secteur 26 + Couronne Zircone 14.',
+    notesConfidentiellesMedecin: 'Bone graft (Bio-Oss) réussi en 2025. Prêt pour pose d\'implant Titane 4.2x11.5mm.',
+    estDossierSensible: false,
+    poidsRef: 76,
+    tailleRef: 180,
+    taRef: '125/80',
+    contactUrgence: {
+      nom: 'Mme Kenza Tazi (Épouse)',
+      lien: 'Épouse',
+      telephone: '+212 6 62 33 44 55'
+    }
+  },
+  {
+    id: 'pat-dent-2',
+    organizationId: 'org-dentaire-alami',
+    nom: 'BENJELLOUN',
+    prenom: 'Salma',
+    sexe: 'F',
+    dateNaissance: '1998-09-12',
+    age: 28,
+    telephone: '+212 6 64 22 33 44',
+    email: 'salma.benjelloun@outlook.com',
+    adresse: '8 Rue Jean Jaurès, Gauthier, Casablanca',
+    ville: 'Casablanca',
+    codePostal: '20100',
+    cin: 'BE719283',
+    numeroAmo: '20491829401',
+    organismeAssurance: 'AMO CNOPS',
+    numAffiliationMutuelle: 'MUT-CNOPS-9201',
+    groupeSanguin: 'A+',
+    medecinTraitant: false,
+    statut: 'Actif',
+    derniereConsultation: '2026-08-22',
+    prochainRdv: '2026-08-30',
+    allergies: [],
+    antecedents: {
+      medicaux: ['Aucun'],
+      chirurgicaux: ['Extraction 38 et 48'],
+      familiaux: ['Aucun antécédent notable']
+    },
+    traitementsActuels: [],
+    ald: false,
+    notesGenerales: 'Demande esthétique : Éclaircissement dentaire fauteuil + Facettes céramiques E-Max 11, 21.',
+    notesConfidentiellesMedecin: 'Gencive saine, biotype épais favorable.',
+    estDossierSensible: false,
+    poidsRef: 58,
+    tailleRef: 167,
+    taRef: '115/75',
+    contactUrgence: {
+      nom: 'M. Mehdi Benjelloun (Frère)',
+      lien: 'Frère',
+      telephone: '+212 6 61 99 88 77'
+    }
+  },
+  {
+    id: 'pat-dent-3',
+    organizationId: 'org-dentaire-alami',
+    nom: 'EL FASSI',
+    prenom: 'Karim',
+    sexe: 'M',
+    dateNaissance: '1981-04-05',
+    age: 45,
+    telephone: '+212 6 61 40 50 60',
+    email: 'karim.elfassi@gmail.com',
+    adresse: '15 Avenue Hassan II, Casablanca',
+    ville: 'Casablanca',
+    codePostal: '20000',
+    cin: 'BJ392810',
+    numeroAmo: '10394820192',
+    organismeAssurance: 'AMO CNSS',
+    numAffiliationMutuelle: 'MUT-SAHAM-3920',
+    groupeSanguin: 'B+',
+    medecinTraitant: false,
+    statut: 'Chronique',
+    derniereConsultation: '2026-08-15',
+    prochainRdv: '2026-09-10',
+    allergies: ['AINS'],
+    antecedents: {
+      medicaux: ['Tabagisme sevré', 'Parodontite stade III grade B'],
+      chirurgicaux: [],
+      familiaux: ['Perte précoce de dents chez les parents']
+    },
+    traitementsActuels: [],
+    ald: false,
+    notesGenerales: 'Suivi parodontal : surfaçage radiculaire par sextants et maintenance tous les 3 mois.',
+    notesConfidentiellesMedecin: 'Poches à 5-6mm en interproximal molaires 16-17 et 26-27.',
+    estDossierSensible: false,
+    poidsRef: 82,
+    tailleRef: 178,
+    taRef: '130/85',
+    contactUrgence: {
+      nom: 'Mme Souad El Fassi (Épouse)',
+      lien: 'Épouse',
+      telephone: '+212 6 63 22 11 00'
+    }
+  },
   // --- Cabinet Dr Yassine EL QYAMI (Agadir - Pédiatrie) : Espace Vierge pour démarrer l'activité réelle ---
 
   // --- Cabinet Dr Karim Bennani (Casablanca - Médecine Générale / Diabétologie) ---
@@ -487,6 +1018,40 @@ export const INITIAL_PATIENTS: Patient[] = [
 // ============================================================================
 
 export const INITIAL_CONSULTATIONS: Consultation[] = [
+  // --- Consultations Cabinet Casablanca (Dr Mehdi EL KETTANI - Cardiologie) ---
+  {
+    id: 'cons-kettani-1',
+    organizationId: 'org-elkettani',
+    patientId: 'pat-kettani-1',
+    doctorId: 'usr-elkettani-owner',
+    patientNomComplet: 'Youssef AMRAOUI',
+    date: '2026-08-25',
+    heure: '10:00',
+    dureeMinutes: 25,
+    type: 'Présentiel',
+    motif: 'Contrôle tensionnel et échocardiographie de suivi annuel',
+    constantes: {
+      tensionSystolique: 128,
+      tensionDiastolique: 82,
+      temperature: 36.8,
+      poids: 82,
+      taille: 176,
+      imc: 26.5,
+      frequenceCardiaque: 64,
+      saturationO2: 99,
+      glycemie: 1.02
+    },
+    symptomes: ['Bonne tolérance à l effort modéré', 'Absence de dyspnée de repos ou orthopnée'],
+    examenClinique: 'Bruits du cœur réguliers sans souffle surajouté. Pas de signes de surcharge droite ou gauche. Échocardiographie transthoracique : FEVG conservée à 62%.',
+    diagnostic: 'Hypertension artérielle essentielle équilibrée sous Co-Aprovel + Amlodipine',
+    codeCim10: 'I10 - Hypertension essentielle',
+    traitement: 'Co-Aprovel 300/12.5mg (1 cp/matin), Amlodipine 5mg (1 cp/soir), Atorvastatine 20mg',
+    notesMedicales: 'Feuille de soins AMO CNSS et devis holter remis.',
+    tarif: 300,
+    reglementStatut: 'Payé',
+    modePaiement: 'Carte Bancaire',
+    createdAt: '2026-08-25 10:25:00'
+  },
   // --- Consultations Cabinet Agadir (Dr Yassine EL QYAMI) : Vierge ---
 
   // --- Consultations Cabinet Casablanca (Dr Karim Bennani) ---
@@ -574,6 +1139,74 @@ export const INITIAL_CERTIFICATES: MedicalCertificate[] = [
 // ============================================================================
 
 export const INITIAL_APPOINTMENTS: Appointment[] = [
+  // --- Cabinet Casablanca (Dr Mehdi EL KETTANI - Cardiologie) ---
+  {
+    id: 'rdv-kettani-1',
+    organizationId: 'org-elkettani',
+    patientId: 'pat-kettani-1',
+    doctorId: 'usr-elkettani-owner',
+    patientNomComplet: 'Youssef AMRAOUI',
+    date: '2026-08-25',
+    heureDebut: '10:00',
+    heureFin: '10:30',
+    motif: 'Contrôle tensionnel & échocardiographie',
+    type: 'Consultation',
+    statut: 'Terminé'
+  },
+  {
+    id: 'rdv-kettani-2',
+    organizationId: 'org-elkettani',
+    patientId: 'pat-kettani-2',
+    doctorId: 'usr-elkettani-owner',
+    patientNomComplet: 'Fatima ZAHRAOUI',
+    date: '2026-08-25',
+    heureDebut: '11:15',
+    heureFin: '11:45',
+    motif: 'Bilan cardiaque annuel & ECG d effort',
+    type: 'Consultation',
+    statut: 'Confirmé'
+  },
+  // --- Cabinet Dentaire Dr. Sara ALAMI (Casablanca) ---
+  {
+    id: 'rdv-dent-1',
+    organizationId: 'org-dentaire-alami',
+    patientId: 'pat-dent-1',
+    doctorId: 'usr-alami-owner',
+    patientNomComplet: 'Othmane TAZI',
+    date: '2026-08-25',
+    heureDebut: '10:00',
+    heureFin: '11:00',
+    motif: 'Pose Implant Titane secteur 26 & RVG de contrôle',
+    type: 'Consultation',
+    statut: 'En cours'
+  },
+  {
+    id: 'rdv-dent-2',
+    organizationId: 'org-dentaire-alami',
+    patientId: 'pat-dent-2',
+    doctorId: 'usr-alami-owner',
+    patientNomComplet: 'Salma BENJELLOUN',
+    date: '2026-08-25',
+    heureDebut: '11:30',
+    heureFin: '12:30',
+    motif: 'Séance Éclaircissement Dentaire Fauteuil LED',
+    type: 'Consultation',
+    statut: 'Confirmé'
+  },
+  {
+    id: 'rdv-dent-3',
+    organizationId: 'org-dentaire-alami',
+    patientId: 'pat-dent-3',
+    doctorId: 'usr-alami-owner',
+    patientNomComplet: 'Karim EL FASSI',
+    date: '2026-08-25',
+    heureDebut: '14:30',
+    heureFin: '15:15',
+    motif: 'Surfaçage radiculaire sextant 2 et 3',
+    type: 'Contrôle',
+    statut: 'Confirmé'
+  },
+
   // --- Cabinet Agadir (Dr Yassine EL QYAMI) : Vierge ---
 
   // --- Cabinet Casablanca (Dr Karim Bennani) ---
@@ -610,6 +1243,20 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
 // ============================================================================
 
 export const INITIAL_WAITING_ROOM: WaitingPatient[] = [
+  // --- Salle d'attente Cabinet Dr. Mehdi EL KETTANI ---
+  {
+    id: 'wait-kettani-1',
+    organizationId: 'org-elkettani',
+    patientId: 'pat-kettani-2',
+    nomComplet: 'Fatima ZAHRAOUI',
+    age: 62,
+    heureArrivee: '11:05',
+    tempsAttenteMinutes: 10,
+    motif: 'Bilan cardiaque annuel & ECG d effort',
+    avecRdv: true,
+    statut: 'En attente',
+    urgence: false
+  },
   // --- Salle d'attente Cabinet Agadir : Vierge ---
 
   // --- Salle d'attente Cabinet Casablanca ---
@@ -1050,3 +1697,156 @@ export const INITIAL_ACCESS_USERS: AccessUser[] = [
     }
   }
 ];
+
+// ============================================================================
+// 19. DEVIS DENTAIRES (QUOTES)
+// ============================================================================
+
+export const INITIAL_DENTAL_QUOTES: DentalQuote[] = [
+  {
+    id: 'dev-dent-001',
+    organizationId: 'org-dentaire-alami',
+    patientId: 'pat-dent-1',
+    patientNomComplet: 'Othmane TAZI',
+    numeroDevis: 'DEV-2026-0042',
+    date: '2026-08-20',
+    validiteJours: 90,
+    praticien: 'Dr. Sara ALAMI',
+    statut: 'Validé Patient',
+    notes: 'Devis pour réhabilitation implanto-portée 26 + Couronne Zircone 14. Acompte de 30% versé à la commande des pièces.',
+    createdAt: '2026-08-20 11:20:00',
+    totalBrutDH: 14100,
+    remiseTotaleDH: 1100,
+    totalNetDH: 13000,
+    totalAmoEstimeDH: 1800,
+    resteAChargePatientDH: 11200,
+    items: [
+      {
+        id: 'item-1',
+        actCode: 'IMP-TITANE',
+        actNom: 'Pose d\'un Implant Dentaire Titane Ostéo-Intégré (Grade V SLA)',
+        categorie: 'Implantologie',
+        toothNumber: 26,
+        cotation: 'HN',
+        quantite: 1,
+        tarifUnitaireDH: 6000,
+        remiseDH: 500,
+        totalDH: 5500,
+        amoEstimeDH: 0,
+        resteAChargeDH: 5500,
+        statut: 'En cours',
+        notes: 'Implant Ø 4.2mm x L 11.5mm'
+      },
+      {
+        id: 'item-2',
+        actCode: 'PILIER-IMP',
+        actNom: 'Pilier implantaire Titane personnalisé CAO/CFAO',
+        categorie: 'Implantologie',
+        toothNumber: 26,
+        cotation: 'HN',
+        quantite: 1,
+        tarifUnitaireDH: 1500,
+        remiseDH: 0,
+        totalDH: 1500,
+        amoEstimeDH: 0,
+        resteAChargeDH: 1500,
+        statut: 'Planifié'
+      },
+      {
+        id: 'item-3',
+        actCode: 'COUR-SUR-IMP',
+        actNom: 'Couronne Zircone / Céramique transvissée sur implant',
+        categorie: 'Implantologie',
+        toothNumber: 26,
+        cotation: 'HN + SPR50',
+        quantite: 1,
+        tarifUnitaireDH: 3800,
+        remiseDH: 300,
+        totalDH: 3500,
+        amoEstimeDH: 840,
+        resteAChargeDH: 2660,
+        statut: 'Planifié'
+      },
+      {
+        id: 'item-4',
+        actCode: 'C-ZIRCONE',
+        actNom: 'Couronne Zircone Pure Monolithique Multicouche 3D',
+        categorie: 'Prothèses Fixes',
+        toothNumber: 14,
+        cotation: 'SPR 50 + HN',
+        quantite: 1,
+        tarifUnitaireDH: 2800,
+        remiseDH: 300,
+        totalDH: 2500,
+        amoEstimeDH: 960,
+        resteAChargeDH: 1540,
+        statut: 'Planifié'
+      }
+    ]
+  },
+  {
+    id: 'dev-dent-002',
+    organizationId: 'org-dentaire-alami',
+    patientId: 'pat-dent-2',
+    patientNomComplet: 'Salma BENJELLOUN',
+    numeroDevis: 'DEV-2026-0043',
+    date: '2026-08-22',
+    validiteJours: 60,
+    praticien: 'Dr. Sara ALAMI',
+    statut: 'Brouillon',
+    notes: 'Projet esthétique Sourire : Blanchiment + 2 facettes E-Max antérieures.',
+    createdAt: '2026-08-22 14:10:00',
+    totalBrutDH: 8500,
+    remiseTotaleDH: 500,
+    totalNetDH: 8000,
+    totalAmoEstimeDH: 0,
+    resteAChargePatientDH: 8000,
+    items: [
+      {
+        id: 'item-5',
+        actCode: 'BLANCH-FAUTEUIL',
+        actNom: 'Éclaircissement dentaire au fauteuil par Lampe LED Bleue',
+        categorie: 'Esthétique & Blanchiment',
+        cotation: 'HN',
+        quantite: 1,
+        tarifUnitaireDH: 2500,
+        remiseDH: 500,
+        totalDH: 2000,
+        amoEstimeDH: 0,
+        resteAChargeDH: 2000,
+        statut: 'Planifié'
+      },
+      {
+        id: 'item-6',
+        actCode: 'FACETTE-CER',
+        actNom: 'Facette dentaire pelliculaire céramique E-Max',
+        categorie: 'Soins Conservateurs',
+        toothNumber: 11,
+        cotation: 'HN',
+        quantite: 1,
+        tarifUnitaireDH: 3000,
+        remiseDH: 0,
+        totalDH: 3000,
+        amoEstimeDH: 0,
+        resteAChargeDH: 3000,
+        statut: 'Planifié'
+      },
+      {
+        id: 'item-7',
+        actCode: 'FACETTE-CER',
+        actNom: 'Facette dentaire pelliculaire céramique E-Max',
+        categorie: 'Soins Conservateurs',
+        toothNumber: 21,
+        cotation: 'HN',
+        quantite: 1,
+        tarifUnitaireDH: 3000,
+        remiseDH: 0,
+        totalDH: 3000,
+        amoEstimeDH: 0,
+        resteAChargeDH: 3000,
+        statut: 'Planifié'
+      }
+    ]
+  }
+];
+

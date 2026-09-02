@@ -21,6 +21,7 @@ export const CertificatesView: React.FC = () => {
     addCertificate,
     settings,
     openPrintPreview,
+    setCurrentTab,
     showToast
   } = useApp();
 

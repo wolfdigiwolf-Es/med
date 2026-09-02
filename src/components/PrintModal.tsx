@@ -209,6 +209,97 @@ export const PrintModal: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {type === 'devis_dentaire' && (
+                <div className="space-y-5 pt-2">
+                  <div className="text-center border-b border-slate-200 pb-3">
+                    <h2 className="text-sm font-extrabold uppercase tracking-wide text-slate-900">
+                      PROPOSITION DE PLAN DE TRAITEMENT & DEVIS DENTAIRE NORMALISÉ
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5 font-mono">
+                      N° Devis : {data.numeroDevis} · Date : {data.date} · Validité : {data.validiteJours || 90} jours
+                    </p>
+                  </div>
+
+                  {data.notes && (
+                    <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-lg text-xs text-blue-900">
+                      <span className="font-bold">Indications cliniques :</span> {data.notes}
+                    </div>
+                  )}
+
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-slate-300 text-slate-700 bg-slate-50">
+                        <th className="py-2 px-2 text-left">Dent (FDI)</th>
+                        <th className="py-2 px-2 text-left">Description de l'acte dentaire</th>
+                        <th className="py-2 px-2 text-center">Cot. AMO</th>
+                        <th className="py-2 px-2 text-right">Tarif (DH)</th>
+                        <th className="py-2 px-2 text-right">Remise</th>
+                        <th className="py-2 px-2 text-right">Total Net</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      {data.items?.map((item: any, idx: number) => (
+                        <tr key={idx} className="hover:bg-slate-50/60">
+                          <td className="py-2 px-2 font-mono font-bold text-blue-700">
+                            {item.toothNumber ? `#${item.toothNumber}` : 'Général'}
+                          </td>
+                          <td className="py-2 px-2">
+                            <p className="font-semibold text-slate-900">{item.actNom}</p>
+                            <p className="text-[10px] text-slate-400">{item.categorie}</p>
+                          </td>
+                          <td className="py-2 px-2 text-center font-mono text-[11px] text-slate-500">
+                            {item.cotation || 'HN'}
+                          </td>
+                          <td className="py-2 px-2 text-right font-mono">{item.tarifUnitaireDH} DH</td>
+                          <td className="py-2 px-2 text-right font-mono text-slate-400">
+                            {item.remiseDH > 0 ? `-${item.remiseDH} DH` : '—'}
+                          </td>
+                          <td className="py-2 px-2 text-right font-mono font-bold text-slate-900">
+                            {item.totalDH} DH
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Financial Summary */}
+                  <div className="flex justify-end pt-3 border-t border-slate-200">
+                    <div className="w-72 space-y-1.5 text-xs bg-slate-50 p-3 rounded-lg border border-slate-200">
+                      <div className="flex justify-between text-slate-600">
+                        <span>Montant Brut Total :</span>
+                        <span className="font-mono">{data.totalBrutDH} DH</span>
+                      </div>
+                      {data.remiseTotaleDH > 0 && (
+                        <div className="flex justify-between text-emerald-600 font-medium">
+                          <span>Remise accordée :</span>
+                          <span className="font-mono">-{data.remiseTotaleDH} DH</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-1 text-sm">
+                        <span>Total Net à Régler :</span>
+                        <span className="font-mono text-blue-700">{data.totalNetDH} DH</span>
+                      </div>
+                      {data.totalAmoEstimeDH > 0 && (
+                        <div className="flex justify-between text-[11px] text-emerald-700 pt-1 border-t border-dashed border-slate-200">
+                          <span>Prise en charge AMO estimée :</span>
+                          <span className="font-mono">{data.totalAmoEstimeDH} DH</span>
+                        </div>
+                      )}
+                      {data.resteAChargePatientDH > 0 && (
+                        <div className="flex justify-between text-[11px] font-semibold text-slate-700">
+                          <span>Reste à charge patient estimé :</span>
+                          <span className="font-mono">{data.resteAChargePatientDH} DH</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-slate-500 italic p-2 bg-slate-50/50 rounded border border-slate-100">
+                    * Devis préalable conforme aux recommandations de l'Ordre National des Médecins Dentistes du Maroc (ONMD). Le patient reconnaît avoir reçu l'information claire et détaillée sur le traitement proposé.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bottom Signature & Stamp */}

@@ -12,6 +12,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Lock,
+  Moon,
+  Sun,
+  Sparkles,
   X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -24,7 +27,10 @@ export const CommandPalette: React.FC = () => {
     openPatientDetail,
     setCurrentTab,
     startConsultationForPatient,
-    medications
+    medications,
+    theme,
+    toggleTheme,
+    setTheme
   } = useApp();
 
   const [query, setQuery] = useState('');
@@ -53,6 +59,7 @@ export const CommandPalette: React.FC = () => {
   );
 
   const navShortcuts = [
+    { label: 'Espace Dentiste & Odontogramme 32 Dents', tab: 'dental' as const, icon: Sparkles },
     { label: 'Tableau de bord', tab: 'dashboard' as const, icon: Stethoscope },
     { label: 'Agenda du jour', tab: 'agenda' as const, icon: Calendar },
     { label: "Salle d'attente", tab: 'waiting-room' as const, icon: Clock },
@@ -61,7 +68,16 @@ export const CommandPalette: React.FC = () => {
     { label: 'Certificats médicaux officiels', tab: 'certificates' as const, icon: ShieldCheck },
     { label: 'Sécurité & Protection des données (Loi 09-08)', tab: 'security-compliance' as const, icon: Lock },
     { label: 'Paramètres du cabinet & Praticien', tab: 'settings' as const, icon: Settings },
-  ].filter((s) => s.label.toLowerCase().includes(query.toLowerCase()));
+  ].filter((s) => s.label.toLowerCase().includes(query.toLowerCase()) || (query.toLowerCase().includes('dent') && s.tab === 'dental'));
+
+  const themeMatches = [
+    {
+      label: theme === 'dark' ? 'Basculer en Mode Jour (Thème Clair)' : 'Basculer en Mode Sombre Clinique (Anti-fatigue oculaire)',
+      action: () => toggleTheme(),
+      icon: theme === 'dark' ? Sun : Moon,
+      badge: theme === 'dark' ? 'Actif: Sombre' : 'Actif: Clair'
+    }
+  ].filter((t) => 'sombre clair theme dark light mode nuit jour confort'.toLowerCase().includes(query.toLowerCase()) || t.label.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-start justify-center pt-20 p-4 animate-in fade-in">
@@ -171,6 +187,38 @@ export const CommandPalette: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Theme Switcher Quick Actions */}
+          {themeMatches.length > 0 && (
+            <div>
+              <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Thème & Ergonomie Visuelle
+              </div>
+              <div className="space-y-0.5 mt-1">
+                {themeMatches.map((t, idx) => {
+                  const Icon = t.icon;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        t.action();
+                        setIsCommandPaletteOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className="w-4 h-4 text-sky-500" />
+                        <span className="font-semibold text-slate-800">{t.label}</span>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
+                        {t.badge}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

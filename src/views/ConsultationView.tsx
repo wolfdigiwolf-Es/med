@@ -581,6 +581,18 @@ export const ConsultationView: React.FC = () => {
 
               <button
                 type="button"
+                onClick={() => setCurrentTab('dental')}
+                className="w-full px-3 py-2 text-left bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl border border-teal-200 text-xs font-semibold flex items-center justify-between transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-teal-600" />
+                  <span>Odontogramme & Devis Dentaire</span>
+                </div>
+                <span>→</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setCurrentTab('certificates')}
                 className="w-full px-3 py-2 text-left bg-slate-50 hover:bg-purple-50 text-slate-700 hover:text-purple-700 rounded-xl border border-slate-200 text-xs font-semibold flex items-center justify-between transition-colors"
               >

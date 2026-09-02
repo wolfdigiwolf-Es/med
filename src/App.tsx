@@ -9,6 +9,7 @@ import { NewPatientModal } from './components/NewPatientModal';
 import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewDocumentModal } from './components/NewDocumentModal';
 import { AccountCredentialsModal } from './components/AccountCredentialsModal';
+import { DentalQuickAccess } from './components/dental/DentalQuickAccess';
 
 // Views
 import { LandingPageView } from './views/LandingPageView';
@@ -30,16 +31,18 @@ import { SettingsView } from './views/SettingsView';
 import { SecurityComplianceView } from './views/SecurityComplianceView';
 import { SupportView } from './views/SupportView';
 import { WolfAdminView } from './views/WolfAdminView';
+import { DentalView } from './views/DentalView';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const AppContent: React.FC = () => {
-  const { currentTab, toasts, dismissToast, isLoggedIn } = useApp();
+  const { currentTab, toasts, dismissToast, isLoggedIn, theme } = useApp();
 
   // Modals state
   const [isNewPatientOpen, setIsNewPatientOpen] = useState(false);
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
   const [isNewDocumentOpen, setIsNewDocumentOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDentalQuickAccessOpen, setIsDentalQuickAccessOpen] = useState(false);
 
   if (!isLoggedIn && currentTab !== 'landing' && currentTab !== 'register') {
     return <LoginView />;
@@ -56,6 +59,8 @@ const AppContent: React.FC = () => {
             onOpenNewAppointment={() => setIsNewAppointmentOpen(true)}
           />
         );
+      case 'dental':
+        return <DentalView />;
       case 'patients':
         return <PatientsView onOpenNewPatient={() => setIsNewPatientOpen(true)} />;
       case 'patient-detail':
@@ -90,7 +95,7 @@ const AppContent: React.FC = () => {
       case 'support':
         return <SupportView />;
       case 'wolf-admin':
-        return <WolfAdminView />;
+        return <WolfAdminView onOpenDentalQuickAccess={() => setIsDentalQuickAccessOpen(true)} />;
       default:
         return (
           <DashboardView
@@ -161,7 +166,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen w-full bg-[#f8fafc] text-slate-900 overflow-hidden font-sans antialiased selection:bg-blue-600 selection:text-white">
+    <div className={`flex h-screen w-full bg-[#f8fafc] dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 overflow-hidden font-sans antialiased selection:bg-blue-600 selection:text-white ${theme === 'dark' ? 'dark' : ''}`}>
       {/* Sidebar */}
       <Sidebar
         isMobileOpen={isMobileMenuOpen}
@@ -169,16 +174,17 @@ const AppContent: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#f8fafc] dark:bg-[#0b0f19]">
         {/* Top Header */}
         <Header
           onOpenNewPatient={() => setIsNewPatientOpen(true)}
           onOpenNewAppointment={() => setIsNewAppointmentOpen(true)}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          onOpenDentalQuickAccess={() => setIsDentalQuickAccessOpen(true)}
         />
 
         {/* Dynamic View Container */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#f8fafc] focus:outline-hidden pb-8 flex flex-col">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#f8fafc] dark:bg-[#0b0f19] focus:outline-hidden pb-8 flex flex-col">
           {renderCurrentView()}
         </main>
       </div>
@@ -188,6 +194,11 @@ const AppContent: React.FC = () => {
       <CommandPalette />
       <PrintModal />
       <AccountCredentialsModal />
+      <DentalQuickAccess
+        isOpen={isDentalQuickAccessOpen}
+        onOpen={() => setIsDentalQuickAccessOpen(true)}
+        onClose={() => setIsDentalQuickAccessOpen(false)}
+      />
       <NewPatientModal isOpen={isNewPatientOpen} onClose={() => setIsNewPatientOpen(false)} />
       <NewAppointmentModal
         isOpen={isNewAppointmentOpen}

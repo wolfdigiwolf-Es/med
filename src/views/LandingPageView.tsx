@@ -54,11 +54,6 @@ export const LandingPageView: React.FC = () => {
   const hoursSavedPerMonth = Math.round((patientsPerDay * 6 * 24) / 60);
   const potentialMonthlyRevenue = patientsPerDay * consultationFee * 24;
 
-  const handleLaunchWorkspace = () => {
-    setCurrentTab('dashboard');
-    showToast('Espace Médical Ouvert', 'Bienvenue sur votre tableau de bord de consultation.');
-  };
-
   const handleDemoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsDemoModalOpen(false);
@@ -159,13 +154,13 @@ export const LandingPageView: React.FC = () => {
               <span>Créer mon Cabinet</span>
             </button>
 
-            {/* Direct App Button */}
+            {/* Demander une Démo */}
             <button
-              onClick={handleLaunchWorkspace}
-              title="Accéder au tableau de bord clinique"
-              className="p-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors cursor-pointer"
+              onClick={() => setIsDemoModalOpen(true)}
+              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors cursor-pointer"
             >
-              <ArrowRight className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+              <span>Demander une Démo</span>
             </button>
           </div>
         </div>
@@ -212,13 +207,13 @@ export const LandingPageView: React.FC = () => {
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              {/* Direct Workspace Launcher */}
+              {/* Request Demo Button */}
               <button
-                onClick={handleLaunchWorkspace}
+                onClick={() => setIsDemoModalOpen(true)}
                 className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-teal-300 hover:text-white font-semibold text-sm rounded-xl border border-teal-500/30 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Play className="w-4 h-4 fill-teal-400" />
-                <span>Accéder au Tableau de Bord</span>
+                <Sparkles className="w-4 h-4 text-teal-400" />
+                <span>Demander une Démo Guidée</span>
               </button>
             </div>
 
@@ -268,11 +263,11 @@ export const LandingPageView: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={handleLaunchWorkspace}
+                      onClick={() => setIsDemoModalOpen(true)}
                       className="px-3.5 py-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-lg shadow transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Award className="w-3.5 h-3.5" />
-                      <span>Tester l'interface en direct</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Demander une Démo</span>
                     </button>
                   </div>
                 </div>
@@ -530,10 +525,10 @@ export const LandingPageView: React.FC = () => {
 
                 <div className="pt-2 flex justify-end">
                   <button
-                    onClick={handleLaunchWorkspace}
+                    onClick={() => setIsDemoModalOpen(true)}
                     className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                   >
-                    <span>Ouvrir l'espace pédiatrique en direct</span>
+                    <span>Demander une démo Pédiatrie</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -560,10 +555,10 @@ export const LandingPageView: React.FC = () => {
 
                 <div className="pt-2 flex justify-end">
                   <button
-                    onClick={handleLaunchWorkspace}
+                    onClick={() => setIsDemoModalOpen(true)}
                     className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                   >
-                    <span>Lancer une consultation de test</span>
+                    <span>Demander une démo Consultation</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -590,10 +585,10 @@ export const LandingPageView: React.FC = () => {
 
                 <div className="pt-2 flex justify-end">
                   <button
-                    onClick={handleLaunchWorkspace}
+                    onClick={() => setIsDemoModalOpen(true)}
                     className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                   >
-                    <span>Explorer le livre journal des recettes</span>
+                    <span>Demander une démo Comptabilité AMO</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -714,10 +709,10 @@ export const LandingPageView: React.FC = () => {
                   <p className="text-[11px] text-slate-300">Activez votre licence au tarif de 3 000 MAD/an.</p>
                 </div>
                 <button
-                  onClick={handleLaunchWorkspace}
+                  onClick={() => openRegisterModal('doctor')}
                   className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
                 >
-                  Démarrer maintenant
+                  Créer mon Cabinet
                 </button>
               </div>
             </div>
@@ -986,11 +981,11 @@ export const LandingPageView: React.FC = () => {
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={handleLaunchWorkspace}
+              onClick={() => setIsDemoModalOpen(true)}
               className="w-full sm:w-auto px-8 py-4 bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm rounded-xl shadow-xl shadow-teal-600/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Ouvrir l'application maintenant</span>
-              <ArrowRight className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
+              <span>Demander une démonstration personnalisée</span>
             </button>
             <button
               onClick={() => openRegisterModal('doctor')}

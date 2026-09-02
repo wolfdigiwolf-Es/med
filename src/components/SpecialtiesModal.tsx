@@ -32,7 +32,7 @@ interface SpecialtiesModalProps {
 }
 
 export const SpecialtiesModal: React.FC<SpecialtiesModalProps> = ({ isOpen, onClose }) => {
-  const { currentOrganization, updateSettings, settings, showToast } = useApp();
+  const { currentOrganization, updateSettings, settings, showToast, loadDrSaraAlamiProfile, setCurrentTab } = useApp();
   const [selectedCategory, setSelectedCategory] = useState('Tous');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSpecialty, setActiveSpecialty] = useState<MedicalSpecialtyConfig>(ALL_MEDICAL_SPECIALTIES[0]);
@@ -59,6 +59,13 @@ export const SpecialtiesModal: React.FC<SpecialtiesModalProps> = ({ isOpen, onCl
   });
 
   const handleApplySpecialty = (spec: MedicalSpecialtyConfig) => {
+    if (spec.id === 'dentaire') {
+      loadDrSaraAlamiProfile();
+      setCurrentTab('dental');
+      onClose();
+      return;
+    }
+
     updateSettings({
       ...settings,
       medecin: {

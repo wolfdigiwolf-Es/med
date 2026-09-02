@@ -1,3 +1,5 @@
+export type ThemeMode = 'light' | 'dark';
+
 export type NavigationTab =
   | 'landing'
   | 'register'
@@ -5,6 +7,7 @@ export type NavigationTab =
   | 'patients'
   | 'patient-detail'
   | 'consultation'
+  | 'dental'
   | 'agenda'
   | 'waiting-room'
   | 'prescriptions'
@@ -564,3 +567,102 @@ export interface WolfDigitalMetric {
   lastBackupSyncTime: string;
   version: string;
 }
+
+// -------------------------------------------------------------
+// DENTISTERIE, ODONTOGRAMME & ACTES BUCCO-DENTAIRES
+// -------------------------------------------------------------
+
+export type DentalToothCondition =
+  | 'saine'
+  | 'carie'
+  | 'obturée'
+  | 'couronne'
+  | 'implant'
+  | 'absente'
+  | 'extraire'
+  | 'devitalisee'
+  | 'appareil'
+  | 'fracture'
+  | 'prothese_amovible';
+
+export type DentalToothSurface = 'O' | 'M' | 'D' | 'V' | 'L' | 'P'; // Occlusal, Mésial, Distal, Vestibulaire, Lingual/Palatin
+
+export interface DentalToothState {
+  number: number; // FDI 11-48 ou temporaire 51-85
+  condition: DentalToothCondition;
+  surfaces?: DentalToothSurface[];
+  notes?: string;
+  periodontalPocketDepthMm?: number; // 1 à 12 mm
+  bleedingOnProbing?: boolean;
+  mobility?: 0 | 1 | 2 | 3;
+  furcation?: 0 | 1 | 2;
+  lastTreatedDate?: string;
+}
+
+export type DentalActCategory =
+  | 'Soins Conservateurs'
+  | 'Endodontie'
+  | 'Chirurgie & Extractions'
+  | 'Prothèses Fixes'
+  | 'Prothèses Amovibles'
+  | 'Implantologie'
+  | 'Parodontologie'
+  | 'Orthodontie & ODF'
+  | 'Esthétique & Blanchiment'
+  | 'Imagerie & Radio'
+  | 'Urgences & Pédodontie';
+
+export interface DentalAct {
+  id: string;
+  code: string;
+  nom: string;
+  categorie: DentalActCategory;
+  cotationNgap: string; // Ex: 'SC12', 'SC17', 'SC33', 'SPR50', 'HN'
+  tarifRefDH: number; // En Dirhams Marocains
+  baseRemboursementAMO: number; // Base Tarif National de Référence (TNR)
+  tauxRemboursementAMO: number; // Ex: 70%, 80%, ou 0% pour Hors Nomenclature (HN)
+  description: string;
+  dureeMinutesEstimee: number;
+  isToothSpecific?: boolean;
+  isSurfaceSpecific?: boolean;
+}
+
+export interface DentalQuoteItem {
+  id: string;
+  actCode: string;
+  actNom: string;
+  categorie: DentalActCategory;
+  toothNumber?: number;
+  toothNumbers?: number[];
+  surfaces?: string[];
+  cotation: string;
+  quantite: number;
+  tarifUnitaireDH: number;
+  remiseDH: number;
+  totalDH: number;
+  amoEstimeDH: number;
+  resteAChargeDH: number;
+  statut: 'Planifié' | 'En cours' | 'Réalisé' | 'Annulé';
+  notes?: string;
+}
+
+export interface DentalQuote {
+  id: string;
+  organizationId: string;
+  patientId: string;
+  patientNomComplet: string;
+  numeroDevis: string;
+  date: string;
+  validiteJours: number;
+  items: DentalQuoteItem[];
+  totalBrutDH: number;
+  remiseTotaleDH: number;
+  totalNetDH: number;
+  totalAmoEstimeDH: number;
+  resteAChargePatientDH: number;
+  statut: 'Brouillon' | 'Validé Patient' | 'Refusé' | 'En cours' | 'Soldé';
+  praticien: string;
+  notes?: string;
+  createdAt: string;
+}
+

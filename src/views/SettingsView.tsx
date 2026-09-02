@@ -10,12 +10,16 @@ import {
   FileBadge,
   Lock,
   ArrowRight,
-  KeyRound
+  KeyRound,
+  Sun,
+  Moon,
+  Eye,
+  Check
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const SettingsView: React.FC = () => {
-  const { settings, updateSettings, setCurrentTab, showToast, openCredentialsModal } = useApp();
+  const { settings, updateSettings, setCurrentTab, showToast, openCredentialsModal, theme, setTheme } = useApp();
 
   const [localSettings, setLocalSettings] = useState(settings);
 
@@ -413,6 +417,83 @@ export const SettingsView: React.FC = () => {
             </div>
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600">
               Les ordonnances, certificats et attestations générés incluront automatiquement les mentions ordinales et fiscales prescrites par la législation marocaine.
+            </div>
+          </div>
+        </div>
+
+        {/* Card 5: Ergonomie Visuelle & Mode Sombre Clinique */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4 md:col-span-2">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-sky-600" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Ergonomie Visuelle & Mode Sombre Clinique (Anti-fatigue oculaire)
+              </h2>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">
+              Confort Praticien
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Mode Clair Option */}
+            <div
+              onClick={() => {
+                setTheme('light');
+                showToast('Mode Clair Activé', 'Interface lumineuse standard.');
+              }}
+              className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
+                theme === 'light'
+                  ? 'border-blue-600 bg-blue-50/40 shadow-xs'
+                  : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+              }`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+                <Sun className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-900">Mode Jour Lumineux</h3>
+                  {theme === 'light' && (
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                      <Check className="w-3 h-3" />
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Arrière-plan clair standard avec contrastes équilibrés, idéal pour les salles de consultation lumineuses.
+                </p>
+              </div>
+            </div>
+
+            {/* Mode Sombre Clinique Option */}
+            <div
+              onClick={() => {
+                setTheme('dark');
+                showToast('Mode Sombre Clinique Activé', 'Protection anti-éblouissement pour consultations prolongées.');
+              }}
+              className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
+                theme === 'dark'
+                  ? 'border-sky-500 bg-slate-900 text-white shadow-xs'
+                  : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+              }`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 shrink-0">
+                <Moon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold">Mode Sombre Clinique Anti-fatigue</h3>
+                  {theme === 'dark' && (
+                    <span className="w-5 h-5 rounded-full bg-sky-500 text-slate-900 flex items-center justify-center font-bold">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Nuances profondes d'obsidienne et de cobalt, calibrées pour réduire l'éblouissement lors de gardes et consultations de longue durée.
+                </p>
+              </div>
             </div>
           </div>
         </div>

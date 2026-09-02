@@ -176,54 +176,30 @@ export const LoginView: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick 1-Click Access for Handover Demo & Real Use */}
-          <div className="pt-4 border-t border-slate-800 space-y-2.5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">
-              Accès Rapide Praticien & Secrétariat
-            </p>
+          {/* Confidentiality & Assistance Notice (Quick access moved to Super Admin Dashboard) */}
+          <div className="pt-4 border-t border-slate-800 space-y-3">
+            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-left space-y-1.5">
+              <div className="flex items-center gap-2 text-teal-400 font-bold text-xs">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Accès Praticien Dédié & Confidentiel</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Chaque cabinet dispose d'un lien d'accès direct et sécurisé configuré par la direction médicale Wolf Digital. Si vous n'avez pas encore reçu votre lien dédié, contactez votre chargé de compte.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 gap-2">
+            <div className="flex items-center justify-between pt-1">
               <button
                 type="button"
-                onClick={handleQuickLoginDoctor}
-                className="w-full p-2.5 rounded-xl bg-teal-950/60 hover:bg-teal-900/60 border border-teal-600/50 text-left flex items-center justify-between group transition-colors cursor-pointer"
+                onClick={() => setCurrentTab('landing')}
+                className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs p-1">
-                    <PediatricLogo className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-teal-200 group-hover:text-white">
-                      Dr. Yassine EL QYAMI
-                    </p>
-                    <p className="text-[10px] text-slate-400">Pédiatrie & Néonatalogie · Agadir</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full border border-teal-500/30">
-                  Médecin Titulaire
-                </span>
+                <span>← Retour au site public</span>
               </button>
 
-              <button
-                type="button"
-                onClick={handleQuickLoginSecretary}
-                className="w-full p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700 text-left flex items-center justify-between group transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-slate-700 text-slate-200 flex items-center justify-center font-bold text-xs">
-                    SEC
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-200 group-hover:text-white">
-                      Soukaina CHAMI (Secrétariat)
-                    </p>
-                    <p className="text-[10px] text-slate-400">Accueil, Rendez-vous & Facturation</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-bold bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">
-                  Secrétaire
-                </span>
-              </button>
+              <span className="text-[11px] text-slate-500 font-mono">
+                Portail v2.6.4
+              </span>
             </div>
           </div>
         </div>

@@ -18,7 +18,9 @@ import {
   LogOut,
   KeyRound,
   Layers,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { NavigationTab } from '../types';
@@ -50,6 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     appointments,
     currentOrganization,
     currentUser,
+    theme,
+    toggleTheme,
     logout,
     openCredentialsModal
   } = useApp();
@@ -59,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+    { id: 'dental', label: 'Espace Dentiste & Actes', icon: Sparkles, badge: 'Dentaire', badgeColor: 'bg-teal-100 text-teal-800 border border-teal-300' },
     { id: 'patients', label: 'Dossiers Patients', icon: Users },
     { id: 'agenda', label: 'Agenda & Rendez-vous', icon: Calendar, badge: todayRdvCount, badgeColor: 'bg-blue-100 text-blue-800' },
     { id: 'waiting-room', label: "Salle d'attente", icon: Clock, badge: waitingCount > 0 ? waitingCount : undefined, badgeColor: 'bg-amber-100 text-amber-800' },
@@ -176,6 +181,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Active Doctor Profile & Logout Footer */}
         <div className="p-3 mt-auto border-t border-slate-100 space-y-2 bg-slate-50/50">
+          {/* Quick Ergonomic Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer shadow-2xs"
+            title="Basculer le mode visuel anti-fatigue"
+          >
+            <div className="flex items-center gap-2">
+              {theme === 'dark' ? (
+                <Moon className="w-3.5 h-3.5 text-sky-400" />
+              ) : (
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+              )}
+              <span className="text-[11px]">Mode {theme === 'dark' ? 'Sombre Clinique' : 'Clair Jour'}</span>
+            </div>
+            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+              {theme === 'dark' ? 'NUIT' : 'JOUR'}
+            </span>
+          </button>
+
           <div
             onClick={openCredentialsModal}
             title="Cliquez pour gérer les accès et mot de passe"

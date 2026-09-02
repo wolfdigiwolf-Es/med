@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import {
   NavigationTab,
+  ThemeMode,
   Organization,
   UserAccount,
   RolePermissions,
@@ -25,7 +26,9 @@ import {
   DataExportJob,
   PrivacyPolicyConfig,
   SupportTicket,
-  WolfDigitalMetric
+  WolfDigitalMetric,
+  DentalQuote,
+  DentalToothState
 } from '../types';
 import {
   ORGANIZATIONS,
@@ -42,18 +45,22 @@ import {
   INITIAL_EXPENSES,
   INITIAL_SETTINGS,
   DR_EL_QYAMI_SETTINGS,
+  DR_SARA_ALAMI_SETTINGS,
+  DR_EL_KETTANI_SETTINGS,
   INITIAL_ACCESS_USERS,
   INITIAL_AUDIT_LOGS,
   INITIAL_PATIENT_CONSENTS,
   INITIAL_RETENTION_POLICIES,
   INITIAL_EXPORT_JOBS,
   INITIAL_SUPPORT_TICKETS,
-  WOLF_DIGITAL_METRICS
+  WOLF_DIGITAL_METRICS,
+  INITIAL_DENTAL_QUOTES
 } from '../data/mockData';
+import { createDefaultOdontogram } from '../data/dentalActsData';
 
 interface PrintPreviewState {
   isOpen: boolean;
-  type: 'prescription' | 'certificate' | 'consultation' | 'feuille_soin';
+  type: 'prescription' | 'certificate' | 'consultation' | 'feuille_soin' | 'devis_dentaire';
   title: string;
   data: any;
 }
@@ -163,7 +170,21 @@ interface AppContextType {
   settings: PracticeSettings;
   updateSettings: (newSettings: PracticeSettings) => void;
   loadDrElQyamiProfile: () => void;
+  loadDrSaraAlamiProfile: () => void;
+  loadDrElKettaniProfile: () => void;
   resetToDefaultProfile: () => void;
+  getDoctorDedicatedUrl: (slugOrOrgId: string) => string;
+  quickLoginDoctor: (orgId: string, userId?: string) => void;
+  dedicatedDoctorSlug: string | null;
+
+  // Dentisterie, Odontogramme & Devis Dentaires
+  dentalQuotes: DentalQuote[];
+  addDentalQuote: (quote: Omit<DentalQuote, 'id' | 'organizationId' | 'createdAt'>) => string;
+  updateDentalQuote: (id: string, updates: Partial<DentalQuote>) => void;
+  deleteDentalQuote: (id: string) => void;
+  getPatientOdontogram: (patientId: string) => Record<number, DentalToothState>;
+  updateToothState: (patientId: string, toothNumber: number, updates: Partial<DentalToothState>) => void;
+  resetPatientOdontogram: (patientId: string) => void;
 
   // Modals & UI utilities
   printPreview: PrintPreviewState;
@@ -173,6 +194,9 @@ interface AppContextType {
   setIsCommandPaletteOpen: (open: boolean) => void;
   soundEnabled: boolean;
   setSoundEnabled: (enabled: boolean) => void;
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  toggleTheme: () => void;
   toasts: ToastMessage[];
   showToast: (title: string, description?: string, type?: ToastMessage['type']) => void;
   dismissToast: (id: string) => void;
@@ -236,6 +260,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [currentUserId, setCurrentUserId] = useState<string>('usr-elqyami-owner');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [dedicatedDoctorSlug, setDedicatedDoctorSlug] = useState<string | null>(null);
   const [sessionMinutesRemaining, setSessionMinutesRemaining] = useState<number>(30);
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState<boolean>(false);
 
@@ -284,6 +309,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(INITIAL_SUPPORT_TICKETS);
   const [wolfMetrics, setWolfMetrics] = useState<WolfDigitalMetric>(WOLF_DIGITAL_METRICS);
 
+  // Dental Quotes & Odontograms State
+  const [allDentalQuotes, setAllDentalQuotes] = useState<DentalQuote[]>(() => {
+    try {
+      const saved = localStorage.getItem('medical_os_dental_quotes');
+      return saved ? JSON.parse(saved) : INITIAL_DENTAL_QUOTES;
+    } catch {
+      return INITIAL_DENTAL_QUOTES;
+    }
+  });
+
+  const [patientOdontograms, setPatientOdontograms] = useState<Record<string, Record<number, DentalToothState>>>(() => {
+    try {
+      const saved = localStorage.getItem('medical_os_odontograms');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+
+    // Initialize with presets for demo dental patients
+    const presets: Record<string, Record<number, DentalToothState>> = {};
+    const taziChart = createDefaultOdontogram();
+    taziChart[26] = { number: 26, condition: 'absente', notes: 'Extraite en 2024 - Projet implant', periodontalPocketDepthMm: 2 };
+    taziChart[14] = { number: 14, condition: 'couronne', notes: 'Couronne Zircone posée', periodontalPocketDepthMm: 3 };
+    taziChart[46] = { number: 46, condition: 'obturée', surfaces: ['O', 'D'], notes: 'Composite MOD', periodontalPocketDepthMm: 2 };
+    taziChart[36] = { number: 36, condition: 'carie', surfaces: ['O'], notes: 'Carie occlusale superficielle', periodontalPocketDepthMm: 2 };
+    presets['pat-dent-1'] = taziChart;
+
+    const salmaChart = createDefaultOdontogram();
+    salmaChart[11] = { number: 11, condition: 'saine', notes: 'Projet Facette E-Max', periodontalPocketDepthMm: 1 };
+    salmaChart[21] = { number: 21, condition: 'saine', notes: 'Projet Facette E-Max', periodontalPocketDepthMm: 1 };
+    salmaChart[38] = { number: 38, condition: 'absente', notes: 'Avulsion passée' };
+    salmaChart[48] = { number: 48, condition: 'absente', notes: 'Avulsion passée' };
+    presets['pat-dent-2'] = salmaChart;
+
+    const elfassiChart = createDefaultOdontogram();
+    elfassiChart[16] = { number: 16, condition: 'saine', periodontalPocketDepthMm: 6, bleedingOnProbing: true, mobility: 1, notes: 'Poche 6mm' };
+    elfassiChart[17] = { number: 17, condition: 'saine', periodontalPocketDepthMm: 5, bleedingOnProbing: true, mobility: 1 };
+    elfassiChart[26] = { number: 26, condition: 'saine', periodontalPocketDepthMm: 6, bleedingOnProbing: true, mobility: 1 };
+    elfassiChart[27] = { number: 27, condition: 'saine', periodontalPocketDepthMm: 5, bleedingOnProbing: true, mobility: 0 };
+    elfassiChart[31] = { number: 31, condition: 'saine', periodontalPocketDepthMm: 4, bleedingOnProbing: true, mobility: 1 };
+    elfassiChart[41] = { number: 41, condition: 'saine', periodontalPocketDepthMm: 4, bleedingOnProbing: true, mobility: 1 };
+    presets['pat-dent-3'] = elfassiChart;
+
+    return presets;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('medical_os_dental_quotes', JSON.stringify(allDentalQuotes));
+    } catch {}
+  }, [allDentalQuotes]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('medical_os_odontograms', JSON.stringify(patientOdontograms));
+    } catch {}
+  }, [patientOdontograms]);
+
   // Active Practice Settings
   const [settings, setSettings] = useState<PracticeSettings>(DR_EL_QYAMI_SETTINGS);
 
@@ -299,8 +380,99 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem('medical_os_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch (e) {
+      return 'light';
+    }
+  });
+
+  const setTheme = (newTheme: ThemeMode) => {
+    setThemeState(newTheme);
+  };
+
+  const toggleTheme = () => {
+    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('medical_os_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      // Ignore in restricted environments
+    }
+  }, [theme]);
+
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [quickSearchQuery, setQuickSearchQuery] = useState('');
+
+  // -------------------------------------------------------------
+  // DEDICATED DOCTOR ACCESS LINK RESOLUTION (e.g. ?doctor=dr-elkettani or /dr-elkettani)
+  // -------------------------------------------------------------
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const doctorParam = urlParams.get('doctor') || urlParams.get('dr') || urlParams.get('cabinet') || urlParams.get('client');
+      const pathSlug = window.location.pathname.replace(/^\//, '').trim();
+      const hashSlug = window.location.hash.replace(/^#\/?/, '').trim();
+
+      const candidate = doctorParam || (pathSlug && pathSlug !== 'index.html' && !pathSlug.startsWith('api') ? pathSlug : '') || hashSlug;
+
+      if (candidate) {
+        const clean = candidate.toLowerCase();
+        let targetOrg = organizations.find((o) => o.slug.toLowerCase() === clean || o.id.toLowerCase() === clean);
+
+        if (!targetOrg) {
+          if (clean.includes('kettani')) {
+            targetOrg = organizations.find((o) => o.id === 'org-elkettani');
+          } else if (clean.includes('qyami')) {
+            targetOrg = organizations.find((o) => o.id === 'org-elqyami');
+          } else if (clean.includes('alami') || clean.includes('dent')) {
+            targetOrg = organizations.find((o) => o.id === 'org-dentaire-alami');
+          } else if (clean.includes('bennani')) {
+            targetOrg = organizations.find((o) => o.id === 'org-bennani');
+          }
+        }
+
+        if (targetOrg) {
+          setDedicatedDoctorSlug(targetOrg.slug);
+          const ownerUser = users.find((u) => u.organizationId === targetOrg!.id && u.role === 'DOCTOR_OWNER')
+            || users.find((u) => u.organizationId === targetOrg!.id);
+
+          if (ownerUser) {
+            setIsLoggedIn(true);
+            setCurrentOrgId(targetOrg.id);
+            setCurrentUserId(ownerUser.id);
+            if (targetOrg.id === 'org-elkettani') setSettings(DR_EL_KETTANI_SETTINGS);
+            else if (targetOrg.id === 'org-dentaire-alami') setSettings(DR_SARA_ALAMI_SETTINGS);
+            else if (targetOrg.id === 'org-elqyami') setSettings(DR_EL_QYAMI_SETTINGS);
+            else if (targetOrg.id === 'org-bennani') setSettings(INITIAL_SETTINGS);
+
+            setCurrentTab('dashboard');
+            setToasts((prev) => [
+              {
+                id: `toast-${Date.now()}`,
+                type: 'success',
+                title: `Portail Praticien : ${targetOrg!.name}`,
+                description: `Connexion sécurisée réussie via votre lien praticien dédié.`
+              },
+              ...prev
+            ]);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('URL parsing error', e);
+    }
+  }, [organizations, users]);
 
   // -------------------------------------------------------------
   // CURRENT TENANT & USER RESOLUTION
@@ -383,10 +555,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return allExportJobs.filter((j) => j.organizationId === currentOrganization.id);
   }, [allExportJobs, currentOrganization.id]);
 
+  const dentalQuotes = useMemo(() => {
+    if (currentUser.role === 'WOLF_DIGITAL_SUPERADMIN') return [];
+    return allDentalQuotes.filter((q) => q.organizationId === currentOrganization.id);
+  }, [allDentalQuotes, currentOrganization.id, currentUser.role]);
+
   // Sync practice settings when organization switches
   useEffect(() => {
     if (currentOrgId === 'org-elqyami') {
       setSettings(DR_EL_QYAMI_SETTINGS);
+    } else if (currentOrgId === 'org-dentaire-alami') {
+      setSettings(DR_SARA_ALAMI_SETTINGS);
     } else if (currentOrgId === 'org-bennani') {
       setSettings(INITIAL_SETTINGS);
     }
@@ -796,13 +975,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!org) return;
 
     setCurrentOrgId(orgId);
+    setIsLoggedIn(true);
+
+    // Synchronize practice settings
+    if (orgId === 'org-elkettani') {
+      setSettings(DR_EL_KETTANI_SETTINGS);
+    } else if (orgId === 'org-dentaire-alami') {
+      setSettings(DR_SARA_ALAMI_SETTINGS);
+    } else if (orgId === 'org-elqyami') {
+      setSettings(DR_EL_QYAMI_SETTINGS);
+    } else if (orgId === 'org-bennani') {
+      setSettings(INITIAL_SETTINGS);
+    }
 
     // Find default user for this org if not specified
     let targetUser: UserAccount | undefined;
     if (userId) {
       targetUser = users.find((u) => u.id === userId);
     } else {
-      targetUser = users.find((u) => u.organizationId === orgId);
+      targetUser = users.find((u) => u.organizationId === orgId && u.role === 'DOCTOR_OWNER')
+        || users.find((u) => u.organizationId === orgId);
     }
 
     if (targetUser) {
@@ -852,7 +1044,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Toast Helper
   const showToast = (title: string, description?: string, type: ToastMessage['type'] = 'success') => {
-    const id = `toast-${Date.now()}`;
+    const uniqueSuffix = Math.random().toString(36).slice(2, 9);
+    const id = `toast-${Date.now()}-${uniqueSuffix}`;
     setToasts((prev) => [...prev, { id, title, description, type }]);
     setTimeout(() => {
       dismissToast(id);
@@ -1435,8 +1628,115 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     switchOrganizationAndUser('org-elqyami', 'usr-elqyami-owner');
   };
 
+  const loadDrSaraAlamiProfile = () => {
+    switchOrganizationAndUser('org-dentaire-alami', 'usr-alami-owner');
+    showToast('Profil Dentiste activé', 'Bienvenue Dr. Sara ALAMI — Cabinet Dentaire & Implantologie');
+  };
+
+  const loadDrElKettaniProfile = () => {
+    switchOrganizationAndUser('org-elkettani', 'usr-elkettani-owner');
+    showToast('Profil Cardiologie activé', 'Bienvenue Dr. Mehdi EL KETTANI — Cabinet Médical & Cardiologie');
+  };
+
   const resetToDefaultProfile = () => {
     switchOrganizationAndUser('org-bennani', 'usr-bennani-owner');
+  };
+
+  const getDoctorDedicatedUrl = (slugOrOrgId: string) => {
+    const org = organizations.find((o) => o.id === slugOrOrgId || o.slug === slugOrOrgId);
+    const slug = org ? org.slug : slugOrOrgId;
+    // Format dedicated link using origin or fallback to official domain
+    const host = window.location.origin && window.location.origin.startsWith('http')
+      ? window.location.origin
+      : 'https://medical.medicalos.com';
+    return `${host}/?doctor=${slug}`;
+  };
+
+  const quickLoginDoctor = (orgId: string, userId?: string) => {
+    switchOrganizationAndUser(orgId, userId);
+  };
+
+  // --- DENTAL METHODS ---
+  const addDentalQuote = (quoteData: Omit<DentalQuote, 'id' | 'organizationId' | 'createdAt'>): string => {
+    const newId = `dev-dent-${Date.now()}`;
+    const newQuote: DentalQuote = {
+      id: newId,
+      organizationId: currentOrganization.id,
+      ...quoteData,
+      createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+
+    setAllDentalQuotes((prev) => [newQuote, ...prev]);
+
+    // Also register a document for traceability
+    const newDoc: MedicalDocument = {
+      id: `doc-quote-${Date.now()}`,
+      organizationId: currentOrganization.id,
+      patientId: quoteData.patientId,
+      patientNomComplet: quoteData.patientNomComplet,
+      nom: `Devis Dentaire ${quoteData.numeroDevis} (${quoteData.items.length} actes).pdf`,
+      categorie: 'Feuille AMO',
+      date: quoteData.date,
+      taille: '145 Ko',
+      auteur: currentUser.name,
+      uploadedByUserId: currentUser.id,
+      typeMime: 'application/pdf',
+      apercuContenu: quoteData.items.map((i) => i.actNom).join(', '),
+      isPrivateVault: true,
+      vaultStoragePath: `vault/${currentOrganization.id}/patients/${quoteData.patientId}/quote-${newId}.pdf.enc`,
+      encryptionAlgorithm: 'AES-256-GCM',
+      checksumSha256: generateAuditHash(`quote-${newId}`),
+      signedUrlExpiresInMinutes: 15
+    };
+    setAllDocuments((prev) => [newDoc, ...prev]);
+
+    logAuditEvent(
+      'MODIFICATION_DOSSIER',
+      'Dossier Patient',
+      `Émission du devis dentaire n° ${quoteData.numeroDevis} - Montant: ${quoteData.totalNetDH} DH`,
+      quoteData.patientId,
+      quoteData.patientNomComplet
+    );
+
+    showToast('Devis dentaire créé', `Devis ${quoteData.numeroDevis} pour ${quoteData.patientNomComplet} (${quoteData.totalNetDH} DH) enregistré.`);
+    return newId;
+  };
+
+  const updateDentalQuote = (id: string, updates: Partial<DentalQuote>) => {
+    setAllDentalQuotes((prev) =>
+      prev.map((q) => (q.id === id && q.organizationId === currentOrganization.id ? { ...q, ...updates } : q))
+    );
+    showToast('Devis mis à jour', 'Les modifications ont été enregistrées.');
+  };
+
+  const deleteDentalQuote = (id: string) => {
+    setAllDentalQuotes((prev) => prev.filter((q) => q.id !== id || q.organizationId !== currentOrganization.id));
+    showToast('Devis supprimé', 'Le devis dentaire a été retiré.');
+  };
+
+  const getPatientOdontogram = (patientId: string): Record<number, DentalToothState> => {
+    if (patientOdontograms[patientId]) {
+      return patientOdontograms[patientId];
+    }
+    return createDefaultOdontogram();
+  };
+
+  const updateToothState = (patientId: string, toothNumber: number, updates: Partial<DentalToothState>) => {
+    setPatientOdontograms((prev) => {
+      const currentChart = prev[patientId] ? { ...prev[patientId] } : createDefaultOdontogram();
+      const existingTooth = currentChart[toothNumber] || { number: toothNumber, condition: 'saine' };
+      currentChart[toothNumber] = { ...existingTooth, ...updates, number: toothNumber };
+      return { ...prev, [patientId]: currentChart };
+    });
+  };
+
+  const resetPatientOdontogram = (patientId: string) => {
+    setPatientOdontograms((prev) => {
+      const copy = { ...prev };
+      delete copy[patientId];
+      return copy;
+    });
+    showToast('Schéma dentaire réinitialisé', 'Toutes les dents ont été remises à l\'état sain.');
   };
 
   const openPrintPreview = (type: PrintPreviewState['type'], title: string, data: any) => {
@@ -1703,7 +2003,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         settings,
         updateSettings,
         loadDrElQyamiProfile,
+        loadDrSaraAlamiProfile,
+        loadDrElKettaniProfile,
         resetToDefaultProfile,
+        getDoctorDedicatedUrl,
+        quickLoginDoctor,
+        dedicatedDoctorSlug,
+
+        dentalQuotes,
+        addDentalQuote,
+        updateDentalQuote,
+        deleteDentalQuote,
+        getPatientOdontogram,
+        updateToothState,
+        resetPatientOdontogram,
 
         printPreview,
         openPrintPreview,
@@ -1712,6 +2025,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsCommandPaletteOpen,
         soundEnabled,
         setSoundEnabled,
+        theme,
+        setTheme,
+        toggleTheme,
         toasts,
         showToast,
         dismissToast,

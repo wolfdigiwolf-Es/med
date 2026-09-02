@@ -25,6 +25,7 @@ export const PrescriptionView: React.FC = () => {
     medications,
     settings,
     openPrintPreview,
+    setCurrentTab,
     showToast
   } = useApp();
 
